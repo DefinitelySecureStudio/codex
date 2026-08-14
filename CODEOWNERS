@@ -1,0 +1,9 @@
+# Default specification ownership; extend with contract-family teams as needed.
+* @andrewperis
+
+# Repository governance and contract-control surfaces.
+/.github/ @andrewperis
+/docs/ @andrewperis
+/rfcs/ @andrewperis
+/schemas/ @andrewperis
+/SECURITY.md @andrewperis

@@ -1,0 +1,52 @@
+name: Contract change
+description: Propose a new or changed stable contract.
+title: "[Contract]: "
+labels:
+  - enhancement
+body:
+  - type: dropdown
+    id: family
+    attributes:
+      label: Contract family
+      options:
+        - Identifiers and naming
+        - Manifests
+        - Context packages
+        - Prompt contracts
+        - Asset conventions
+        - Taxonomies
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What interoperability or contract problem needs resolution?
+    validations:
+      required: true
+  - type: dropdown
+    id: compatibility
+    attributes:
+      label: Expected compatibility
+      options:
+        - Compatible
+        - Breaking
+        - Editorial only
+        - Unknown
+    validations:
+      required: true
+  - type: textarea
+    id: consumers
+    attributes:
+      label: Consumers and migration
+      description: Identify affected repositories, versions, and migration needs.
+    validations:
+      required: true
+  - type: checkboxes
+    id: content
+    attributes:
+      label: Public-content confirmation
+      options:
+        - label: This proposal contains no private context, proprietary lore, unpublished canon, credentials, or personal data.
+          required: true

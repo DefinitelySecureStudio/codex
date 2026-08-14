@@ -1,0 +1,34 @@
+name: Specification bug
+description: Report an ambiguity, contradiction, or schema/specification mismatch.
+title: "[Spec bug]: "
+labels:
+  - bug
+body:
+  - type: input
+    id: contract
+    attributes:
+      label: Contract and version
+      description: Identify the affected contract and exact version or revision.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the ambiguity, contradiction, or mismatch.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Synthetic example
+      description: Provide a minimal example containing no private production content.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Consumer impact
+      description: Which implementations or repositories are affected?
+    validations:
+      required: true
