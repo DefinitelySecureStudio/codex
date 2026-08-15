@@ -37,3 +37,12 @@ specification, fixtures, compatibility classification, and changelog must agree.
 Run all repository validation commands once tooling is introduced. Until then,
 validate Markdown links, parse every changed YAML or JSON file, and confirm that
 valid fixtures pass while invalid fixtures fail for the documented reason.
+
+## Contributions and licensing
+
+By intentionally submitting a contribution for inclusion, you license it under
+the [Apache License 2.0](LICENSE), consistent with section 5 of that license.
+You represent that you have the right to submit it. Identify third-party text,
+schemas, examples, or other material in the pull request and preserve every
+required license and notice; do not submit material with unknown or incompatible
+terms.
