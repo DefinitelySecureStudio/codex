@@ -38,10 +38,39 @@ A breaking change requires:
 
 ## Repository releases
 
-Repository tags, artifact packaging, immutable pinning, and the relationship
-between repository releases and independently versioned contracts will be
-finalized by
-[studio issue #33](https://github.com/DefinitelySecureStudio/studio/issues/33).
-Until then, consumers must pin an immutable Git commit and record the individual
-contract version. Moving branches such as `main` are not reproducible release
-references.
+Each independently consumable contract is released as a self-contained bundle
+containing its normative specification, schemas, conformance fixtures, license,
+notices, and a manifest of included files and SHA-256 digests.
+
+Use an immutable GitHub Release tag in the form
+`contract/<contract-name>/vMAJOR.MINOR.PATCH`. Prepare all assets on a draft and
+publish once after validation. The release identifies the exact Codex commit.
+
+A production consumer records the complete stable reference tuple:
+
+- repository and contract name;
+- semantic version and immutable release tag;
+- exact source commit;
+- artifact URI, media type, and byte size; and
+- `sha256:` artifact digest.
+
+The version and tag communicate compatibility; the digest identifies the bytes;
+the commit preserves source traceability. Moving branches, floating version
+ranges, tags without digest verification, and copied local schemas are not
+production references.
+
+The organization-wide mechanism and upgrade rules are defined by the
+[Studio dependency strategy](https://github.com/DefinitelySecureStudio/studio/blob/main/dependency-strategy/README.md).
+
+## Canonical schema identifiers
+
+JSON Schemas use an absolute, version-specific `$id` in this form:
+
+```text
+urn:definitely-secure:contract:<contract-name>:<MAJOR.MINOR.PATCH>:<schema-name>
+```
+
+Contract and schema names use lowercase ASCII kebab-case. The identifier names
+the logical schema; the released contract manifest supplies its retrievable
+artifact URI, exact commit, size, and digest. A new schema version receives a
+new `$id`; do not serve changed bytes under an existing identifier.
