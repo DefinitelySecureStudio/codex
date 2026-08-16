@@ -26,12 +26,17 @@ A normative change is accepted only when:
 5. CODEOWNERS approval and required repository reviews are complete; and
 6. the changelog records the contract, version, and change class.
 
+Before production consumption, the accepted contract must also be packaged in
+an immutable release, its asset size and SHA-256 digest verified, and its full
+stable reference tuple recorded by each consumer.
+
 ## Promotion from the lab
 
 Promotion is a review, not a copy operation. Experimental material must be
 reframed as an implementation-neutral contract, stripped of private or
 story-specific content, assigned owners and a version, and supported by
-conformance fixtures. Production code does not move into this repository.
+conformance fixtures. Record the source Lab commit as promotion lineage, not as
+a dependency. Production code does not move into this repository.
 
 ## Supersession and deprecation
 

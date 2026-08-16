@@ -9,6 +9,6 @@ canonical identifier once the namespace is selected, and link to valid and
 invalid fixtures. A schema must not introduce behavior absent from the
 human-readable specification.
 
-The canonical schema-ID namespace and artifact distribution mechanism are
-deferred to
-[studio issue #33](https://github.com/DefinitelySecureStudio/studio/issues/33).
+Use the canonical, version-specific schema-ID namespace and immutable artifact
+distribution mechanism defined in
+[`docs/versioning.md`](../docs/versioning.md#canonical-schema-identifiers).
