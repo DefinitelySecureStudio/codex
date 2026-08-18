@@ -6,5 +6,7 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Adopted Constitution v1.0.0 with a revision-scoped conformance assessment and
+  constitutional reference fields for RFC and specification templates.
 - Created the initial RFC, specification, schema, fixture, and governance
   structure.
