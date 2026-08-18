@@ -1,0 +1,856 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:definitely-secure:contract:prompt-definition:1.0.0:prompt-definition",
+  "title": "Definitely Secure Studio Prompt Definition v1.0.0",
+  "description": "Portable provider-neutral definition of one versioned Studio prompt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spec_version",
+    "id",
+    "version",
+    "name",
+    "description",
+    "purpose",
+    "owners",
+    "lifecycle",
+    "inputs",
+    "context_slots",
+    "template",
+    "capabilities",
+    "output",
+    "provenance",
+    "governance"
+  ],
+  "properties": {
+    "spec_version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "$ref": "#/$defs/promptId"
+    },
+    "version": {
+      "$ref": "#/$defs/semver"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "owners": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/owner"
+      }
+    },
+    "lifecycle": {
+      "$ref": "#/$defs/lifecycle"
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+        "maxLength": 64
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/input"
+      }
+    },
+    "context_slots": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/contextSlot"
+      }
+    },
+    "template": {
+      "$ref": "#/$defs/template"
+    },
+    "capabilities": {
+      "$ref": "#/$defs/capabilities"
+    },
+    "output": {
+      "$ref": "#/$defs/output"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "governance": {
+      "$ref": "#/$defs/governance"
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/extension"
+      }
+    }
+  },
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
+    },
+    "promptId": {
+      "type": "string",
+      "pattern": "^prompt\\.[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?(?:\\.[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?)+$",
+      "maxLength": 255
+    },
+    "symbol": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]{0,63}$"
+    },
+    "owner": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9@][A-Za-z0-9_.:/@-]{0,127}$"
+    },
+    "classification": {
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "restricted"
+      ]
+    },
+    "absoluteUri": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "draft",
+            "experimental",
+            "stable",
+            "deprecated",
+            "retired"
+          ]
+        },
+        "deprecation": {
+          "$ref": "#/$defs/deprecation"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "deprecated",
+                  "retired"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "required": [
+              "deprecation"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "deprecation"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "deprecation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deprecated_at",
+        "reason",
+        "support_until"
+      ],
+      "properties": {
+        "deprecated_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "support_until": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "replacement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/promptId"
+            },
+            "version": {
+              "$ref": "#/$defs/semver"
+            }
+          }
+        },
+        "no_replacement_reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "replacement"
+          ],
+          "not": {
+            "required": [
+              "no_replacement_reason"
+            ]
+          }
+        },
+        {
+          "required": [
+            "no_replacement_reason"
+          ],
+          "not": {
+            "required": [
+              "replacement"
+            ]
+          }
+        }
+      ]
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description",
+        "type",
+        "required",
+        "classification"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/symbol"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "type": {
+          "enum": [
+            "string",
+            "integer",
+            "number",
+            "boolean",
+            "object",
+            "array"
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "classification": {
+          "$ref": "#/$defs/classification"
+        },
+        "constraints": {
+          "$ref": "#/$defs/constraints"
+        },
+        "default": true
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "required": {
+                "const": true
+              }
+            },
+            "required": [
+              "required"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "default"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "enum": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": [
+              "string",
+              "number",
+              "integer",
+              "boolean",
+              "null"
+            ]
+          }
+        },
+        "min_length": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_length": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "maximum": {
+          "type": "number"
+        },
+        "min_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_items": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "contextSlot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description",
+        "required",
+        "accepted_classifications"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/symbol"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "accepted_classifications": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/classification"
+          }
+        },
+        "accepted_media_types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$"
+          }
+        },
+        "max_bytes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "template": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "messages"
+      ],
+      "properties": {
+        "format": {
+          "const": "studio-messages-v1"
+        },
+        "messages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/message"
+          }
+        }
+      }
+    },
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "parts"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "instruction",
+            "user",
+            "assistant-example"
+          ]
+        },
+        "parts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/textPart"
+              },
+              {
+                "$ref": "#/$defs/inputPart"
+              },
+              {
+                "$ref": "#/$defs/contextPart"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "textPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "text"
+      ],
+      "properties": {
+        "type": {
+          "const": "text"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "inputPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "name"
+      ],
+      "properties": {
+        "type": {
+          "const": "input"
+        },
+        "name": {
+          "$ref": "#/$defs/symbol"
+        },
+        "format": {
+          "enum": [
+            "text",
+            "json"
+          ],
+          "default": "text"
+        }
+      }
+    },
+    "contextPart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "slot"
+      ],
+      "properties": {
+        "type": {
+          "const": "context"
+        },
+        "slot": {
+          "$ref": "#/$defs/symbol"
+        },
+        "format": {
+          "enum": [
+            "text",
+            "json"
+          ],
+          "default": "text"
+        }
+      }
+    },
+    "capability": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)*$",
+      "maxLength": 128
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "optional"
+      ],
+      "properties": {
+        "required": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "contains": {
+            "const": "text-generation"
+          },
+          "items": {
+            "$ref": "#/$defs/capability"
+          }
+        },
+        "optional": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/capability"
+          }
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "media_type",
+        "description"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "text",
+            "json"
+          ]
+        },
+        "media_type": {
+          "enum": [
+            "text/plain",
+            "application/json"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "schema": {
+          "$ref": "#/$defs/artifactSchemaReference"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "text"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "media_type": {
+                "const": "text/plain"
+              }
+            },
+            "not": {
+              "required": [
+                "schema"
+              ]
+            }
+          },
+          "else": {
+            "properties": {
+              "media_type": {
+                "const": "application/json"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "artifactSchemaReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_id",
+        "repository",
+        "contract",
+        "version",
+        "tag",
+        "commit",
+        "artifact_uri",
+        "media_type",
+        "byte_size",
+        "sha256"
+      ],
+      "properties": {
+        "schema_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
+        },
+        "contract": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "version": {
+          "$ref": "#/$defs/semver"
+        },
+        "tag": {
+          "type": "string",
+          "pattern": "^contract/[a-z0-9]+(?:-[a-z0-9]+)*/v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "artifact_uri": {
+          "$ref": "#/$defs/absoluteUri"
+        },
+        "media_type": {
+          "const": "application/schema+json"
+        },
+        "byte_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "origin",
+        "created_by",
+        "created_at",
+        "source_references",
+        "rights"
+      ],
+      "properties": {
+        "origin": {
+          "enum": [
+            "studio-original",
+            "promoted-experiment",
+            "derived",
+            "third-party"
+          ]
+        },
+        "created_by": {
+          "$ref": "#/$defs/owner"
+        },
+        "created_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "source_references": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/absoluteUri"
+          }
+        },
+        "rights": {
+          "$ref": "#/$defs/rights"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "origin": {
+                "enum": [
+                  "promoted-experiment",
+                  "derived",
+                  "third-party"
+                ]
+              }
+            },
+            "required": [
+              "origin"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_references": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "rights": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "reviewed_by",
+        "reviewed_at",
+        "notices"
+      ],
+      "properties": {
+        "basis": {
+          "enum": [
+            "studio-original",
+            "licensed",
+            "public-domain",
+            "approved-public"
+          ]
+        },
+        "reviewed_by": {
+          "$ref": "#/$defs/owner"
+        },
+        "reviewed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "notices": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "restrictions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constitution",
+        "decision_owner",
+        "evidence"
+      ],
+      "properties": {
+        "constitution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "tag",
+            "commit"
+          ],
+          "properties": {
+            "version": {
+              "const": "1.0.0"
+            },
+            "tag": {
+              "const": "constitution/v1.0.0"
+            },
+            "commit": {
+              "const": "a9cc8a503aa30e17820edc62ac95f7cbe10e0564"
+            }
+          }
+        },
+        "decision_owner": {
+          "$ref": "#/$defs/owner"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/absoluteUri"
+          }
+        }
+      }
+    },
+    "extension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "fallback",
+        "configuration"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "fallback": {
+          "enum": [
+            "reject",
+            "portable-baseline",
+            "omit"
+          ]
+        },
+        "configuration": {
+          "type": "object"
+        },
+        "evidence": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/absoluteUri"
+          }
+        }
+      }
+    }
+  }
+}
