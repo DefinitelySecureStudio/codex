@@ -8,6 +8,12 @@
 - Compatibility: Breaking, compatible, or editorial
 - Supersedes: None
 - Superseded by: None
+- Constitution version: 1.0.0
+- Constitution tag: `constitution/v1.0.0`
+- Constitution commit: `a9cc8a503aa30e17820edc62ac95f7cbe10e0564`
+- Applicable checklist profile: ADR, RFC, and stable specification
+- Conformance evidence: Issue or pull-request URL
+- Decision owner and required A4 reviewers: GitHub handles
 
 ## Summary
 
@@ -31,6 +37,12 @@ window, and migration guidance.
 
 Explain trust boundaries, validation requirements, data minimization, and risks
 of sensitive or private context.
+
+## Rights, provenance, accessibility, and portability
+
+Identify input rights and provenance, accessibility effects, provider-neutral
+baseline behavior, failure behavior, and any approved capability-specific
+extension and exit plan.
 
 ## Alternatives considered
 
