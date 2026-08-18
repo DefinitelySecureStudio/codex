@@ -1,0 +1,162 @@
+{
+  "spec_version": "1.0.0",
+  "id": "prompt.reference.extract-public-facts",
+  "version": "1.1.0",
+  "name": "Extract public facts",
+  "description": "Synthetic reference prompt using an explicit public context slot and JSON output.",
+  "purpose": "Extract stated public facts into a reviewed JSON shape; it does not retrieve sources, establish truth, or approve downstream use.",
+  "owners": [
+    "@andrewperis"
+  ],
+  "lifecycle": {
+    "status": "experimental"
+  },
+  "tags": [
+    "extraction",
+    "reference"
+  ],
+  "inputs": [
+    {
+      "name": "requested_fields",
+      "description": "Explicit list of synthetic field names requested by the caller.",
+      "type": "array",
+      "required": true,
+      "classification": "public",
+      "constraints": {
+        "min_items": 1,
+        "max_items": 10
+      }
+    },
+    {
+      "name": "include_unknowns",
+      "description": "Whether the output should preserve explicitly unknown values.",
+      "type": "boolean",
+      "required": false,
+      "classification": "public",
+      "default": true
+    }
+  ],
+  "context_slots": [
+    {
+      "name": "approved_context",
+      "description": "Prepared reader-safe source material supplied by the Context Builder boundary.",
+      "required": true,
+      "accepted_classifications": [
+        "public"
+      ],
+      "accepted_media_types": [
+        "text/plain"
+      ],
+      "max_bytes": 16000
+    }
+  ],
+  "template": {
+    "format": "studio-messages-v1",
+    "messages": [
+      {
+        "role": "instruction",
+        "parts": [
+          {
+            "type": "text",
+            "text": "Return JSON containing only facts explicitly present in the approved context."
+          }
+        ]
+      },
+      {
+        "role": "user",
+        "parts": [
+          {
+            "type": "text",
+            "text": "Requested fields: "
+          },
+          {
+            "type": "input",
+            "name": "requested_fields",
+            "format": "json"
+          },
+          {
+            "type": "text",
+            "text": "\nPreserve unknowns: "
+          },
+          {
+            "type": "input",
+            "name": "include_unknowns",
+            "format": "text"
+          },
+          {
+            "type": "text",
+            "text": "\nApproved context:\n"
+          },
+          {
+            "type": "context",
+            "slot": "approved_context",
+            "format": "text"
+          }
+        ]
+      }
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "text-generation"
+    ],
+    "optional": [
+      "structured-output"
+    ]
+  },
+  "output": {
+    "kind": "json",
+    "media_type": "application/json",
+    "description": "A JSON object containing requested public facts and explicit unknown values for human review.",
+    "schema": {
+      "schema_id": "urn:definitely-secure:contract:reference-facts:1.0.0:result",
+      "repository": "DefinitelySecureStudio/codex",
+      "contract": "reference-facts",
+      "version": "1.0.0",
+      "tag": "contract/reference-facts/v1.0.0",
+      "commit": "1111111111111111111111111111111111111111",
+      "artifact_uri": "https://example.invalid/definitely-secure/contracts/reference-facts-v1.0.0.json",
+      "media_type": "application/schema+json",
+      "byte_size": 512,
+      "sha256": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+    }
+  },
+  "provenance": {
+    "origin": "promoted-experiment",
+    "created_by": "@andrewperis",
+    "created_at": "2026-08-17T00:00:00Z",
+    "source_references": [
+      "https://example.invalid/definitely-secure/lab/experiments/EXP-0001"
+    ],
+    "rights": {
+      "basis": "studio-original",
+      "reviewed_by": "@andrewperis",
+      "reviewed_at": "2026-08-17T00:00:00Z",
+      "notices": [],
+      "restrictions": "Synthetic fixture only; not an approved production prompt or output schema."
+    }
+  },
+  "governance": {
+    "constitution": {
+      "version": "1.0.0",
+      "tag": "constitution/v1.0.0",
+      "commit": "a9cc8a503aa30e17820edc62ac95f7cbe10e0564"
+    },
+    "decision_owner": "@andrewperis",
+    "evidence": [
+      "https://github.com/DefinitelySecureStudio/studio/issues/62"
+    ]
+  },
+  "extensions": {
+    "example.response-hint": {
+      "required": false,
+      "fallback": "portable-baseline",
+      "configuration": {
+        "hint": "Prefer a provider-native JSON response mode when compatible."
+      },
+      "evidence": [
+        "https://example.invalid/definitely-secure/reviews/response-hint"
+      ]
+    }
+  }
+}

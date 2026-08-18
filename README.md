@@ -44,6 +44,10 @@ reference, exact assessed revision, checklist evidence, and review triggers.
 | [`docs/`](docs/) | Versioning, compatibility, and change-control policy |
 | [`.github/`](.github/) | Contribution and repository workflow templates |
 
+The first prompt contract is the
+[Prompt Definition Specification v1.0.0](specs/prompt-contracts/prompt-definition-v1.md),
+with its JSON Schema and synthetic conformance fixtures.
+
 ## Authority and boundaries
 
 An accepted specification or schema in this repository is the source of truth

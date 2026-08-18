@@ -1,0 +1,81 @@
+{
+  "spec_version": "1.0.0",
+  "id": "prompt.reference.legacy-summary",
+  "version": "2.1.0",
+  "name": "Legacy summary",
+  "description": "Synthetic deprecated prompt used to validate lifecycle metadata.",
+  "purpose": "Demonstrate an explicit replacement and support window; not for production execution.",
+  "owners": [
+    "@andrewperis"
+  ],
+  "lifecycle": {
+    "status": "deprecated",
+    "deprecation": {
+      "deprecated_at": "2026-08-17T00:00:00Z",
+      "reason": "A replacement has a clearer public-data boundary.",
+      "support_until": "2026-11-15T00:00:00Z",
+      "replacement": {
+        "id": "prompt.reference.summarize-public-text",
+        "version": "1.0.0"
+      }
+    }
+  },
+  "inputs": [
+    {
+      "name": "text",
+      "description": "Synthetic public input.",
+      "type": "string",
+      "required": true,
+      "classification": "public"
+    }
+  ],
+  "context_slots": [],
+  "template": {
+    "format": "studio-messages-v1",
+    "messages": [
+      {
+        "role": "user",
+        "parts": [
+          {
+            "type": "input",
+            "name": "text"
+          }
+        ]
+      }
+    ]
+  },
+  "capabilities": {
+    "required": [
+      "text-generation"
+    ],
+    "optional": []
+  },
+  "output": {
+    "kind": "text",
+    "media_type": "text/plain",
+    "description": "Synthetic summary output."
+  },
+  "provenance": {
+    "origin": "studio-original",
+    "created_by": "@andrewperis",
+    "created_at": "2026-08-17T00:00:00Z",
+    "source_references": [],
+    "rights": {
+      "basis": "studio-original",
+      "reviewed_by": "@andrewperis",
+      "reviewed_at": "2026-08-17T00:00:00Z",
+      "notices": []
+    }
+  },
+  "governance": {
+    "constitution": {
+      "version": "1.0.0",
+      "tag": "constitution/v1.0.0",
+      "commit": "a9cc8a503aa30e17820edc62ac95f7cbe10e0564"
+    },
+    "decision_owner": "@andrewperis",
+    "evidence": [
+      "https://github.com/DefinitelySecureStudio/studio/issues/62"
+    ]
+  }
+}
