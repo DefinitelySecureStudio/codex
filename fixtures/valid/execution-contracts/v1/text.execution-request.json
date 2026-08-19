@@ -1,0 +1,93 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "execution-request",
+  "execution_id": "exec_reference_0001",
+  "correlation_id": "build_reference_0001",
+  "idempotency_key": "idem_reference_0001",
+  "rendered_prompt": {
+    "format": "studio-rendered-messages-v1",
+    "definition": {
+      "id": "prompt.reference.summarize-public-text",
+      "version": "1.0.0",
+      "spec_version": "1.0.0"
+    },
+    "renderer": {
+      "name": "@definitely-secure-studio/platform/prompt-sdk",
+      "version": "0.1.0",
+      "algorithm": "typed-parts-v1",
+      "canonical_json": "studio-json-v1",
+      "contract": {
+        "repository": "DefinitelySecureStudio/codex",
+        "commit": "bd31b6249e068d3317306afb857d68024f2929be",
+        "status": "provisional-unreleased"
+      }
+    },
+    "classification": "public",
+    "messages": [
+      {
+        "role": "instruction",
+        "content": "Summarize only the explicitly supplied synthetic text."
+      },
+      {
+        "role": "user",
+        "content": "Source text: A synthetic blue cube is on a table."
+      }
+    ],
+    "inputs": [
+      {
+        "name": "source_text",
+        "source": "provided",
+        "classification": "public"
+      }
+    ],
+    "contexts": [],
+    "byte_size": 735,
+    "sha256": "sha256:8ec73c464978c5ff70259516fbd9fb35a0d8712c7b2e3453e72dbe31816675fd"
+  },
+  "target": {
+    "adapter_id": "studio.mock.text",
+    "provider_id": "studio-mock",
+    "model_id": "mock-text-v1"
+  },
+  "capabilities": {
+    "required": ["text-generation", "seeded-generation"],
+    "optional": ["structured-output"]
+  },
+  "parameters": {
+    "max_output_tokens": 128,
+    "temperature": 1,
+    "top_p": 1,
+    "stop_sequences": ["END"],
+    "seed": 7
+  },
+  "expected_output": {
+    "kind": "text",
+    "media_type": "text/plain",
+    "validation": "none"
+  },
+  "timeout_ms": 30000,
+  "cancellation_id": "cancel_reference_0001",
+  "delegation": {
+    "caller_id": "workflow.reference",
+    "human_owner": "andrewperis",
+    "purpose": "Exercise the synthetic provider-neutral execution contract; no publication or Canon decision is authorized.",
+    "authority_reference": "https://github.com/DefinitelySecureStudio/studio/issues/65"
+  },
+  "observability": {
+    "retention": "metadata-only",
+    "capture_prompt": false,
+    "capture_output": false
+  },
+  "extensions": {
+    "studio.mock.trace-label": {
+      "required": false,
+      "fallback": "omit",
+      "configuration": {
+        "label": "synthetic-reference"
+      },
+      "evidence": [
+        "https://github.com/DefinitelySecureStudio/studio/issues/65"
+      ]
+    }
+  }
+}

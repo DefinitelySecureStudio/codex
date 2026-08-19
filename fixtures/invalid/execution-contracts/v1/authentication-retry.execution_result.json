@@ -1,0 +1,32 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "execution-result",
+  "execution_id": "exec_invalid_auth_retry",
+  "status": "failed",
+  "identity": {
+    "adapter_id": "studio.mock.text",
+    "adapter_version": "1.0.0",
+    "provider_id": "studio-mock",
+    "model_id": "mock-text-v1"
+  },
+  "timing": {
+    "started_at": "2026-08-19T00:00:00.010Z",
+    "completed_at": "2026-08-19T00:00:00.000Z",
+    "duration_ms": 999
+  },
+  "finish_reason": "error",
+  "usage": {
+    "provider_reported": true,
+    "input_tokens": 2,
+    "output_tokens": 3,
+    "total_tokens": 99
+  },
+  "warnings": [],
+  "error": {
+    "category": "authentication",
+    "code": "PROVIDER_AUTHENTICATION",
+    "message": "Synthetic authentication failure.",
+    "retryable": true,
+    "stage": "provider"
+  }
+}

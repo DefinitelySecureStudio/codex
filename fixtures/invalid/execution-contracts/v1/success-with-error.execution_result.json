@@ -1,0 +1,35 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "execution-result",
+  "execution_id": "exec_invalid_success",
+  "status": "succeeded",
+  "identity": {
+    "adapter_id": "studio.mock.text",
+    "adapter_version": "1.0.0",
+    "provider_id": "studio-mock",
+    "model_id": "mock-text-v1"
+  },
+  "timing": {
+    "started_at": "2026-08-19T00:00:00.000Z",
+    "completed_at": "2026-08-19T00:00:00.001Z",
+    "duration_ms": 1
+  },
+  "finish_reason": "stop",
+  "warnings": [],
+  "output": {
+    "kind": "text",
+    "media_type": "text/plain",
+    "delivery": "inline",
+    "classification": "public",
+    "byte_size": 2,
+    "sha256": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "content": "ok"
+  },
+  "error": {
+    "category": "internal",
+    "code": "IMPOSSIBLE_ERROR",
+    "message": "A successful result cannot also contain an error.",
+    "retryable": false,
+    "stage": "normalization"
+  }
+}

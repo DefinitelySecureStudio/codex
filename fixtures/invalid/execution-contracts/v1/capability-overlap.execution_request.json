@@ -1,0 +1,41 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "execution-request",
+  "execution_id": "exec_invalid_overlap",
+  "idempotency_key": "idem_invalid_overlap",
+  "rendered_prompt": {
+    "format": "studio-rendered-messages-v1",
+    "definition": { "id": "prompt.reference.invalid-overlap", "version": "1.0.0", "spec_version": "1.0.0" },
+    "renderer": {
+      "name": "synthetic-renderer",
+      "version": "1.0.0",
+      "algorithm": "typed-parts-v1",
+      "canonical_json": "studio-json-v1",
+      "contract": {
+        "repository": "DefinitelySecureStudio/codex",
+        "commit": "bd31b6249e068d3317306afb857d68024f2929be",
+        "status": "provisional-unreleased"
+      }
+    },
+    "classification": "public",
+    "messages": [{ "role": "user", "content": "Synthetic request." }],
+    "inputs": [],
+    "contexts": [],
+    "byte_size": 513,
+    "sha256": "sha256:59552badea1f66b63126a70904c623875a22f84a355116724bbd6290d1b3432a"
+  },
+  "target": { "adapter_id": "studio.mock.text", "provider_id": "studio-mock", "model_id": "mock-text-v1" },
+  "capabilities": {
+    "required": ["text-generation"],
+    "optional": ["text-generation"]
+  },
+  "parameters": { "temperature": 3 },
+  "expected_output": { "kind": "text", "media_type": "text/plain", "validation": "none" },
+  "delegation": {
+    "caller_id": "workflow.reference",
+    "human_owner": "andrewperis",
+    "purpose": "Synthetic invalid fixture.",
+    "authority_reference": "https://github.com/DefinitelySecureStudio/studio/issues/65"
+  },
+  "observability": { "retention": "metadata-only", "capture_prompt": false, "capture_output": false }
+}

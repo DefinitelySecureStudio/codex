@@ -1,0 +1,32 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "execution-result",
+  "execution_id": "exec_reference_0002",
+  "status": "failed",
+  "identity": {
+    "adapter_id": "studio.mock.text",
+    "adapter_version": "1.0.0",
+    "provider_id": "studio-mock",
+    "model_id": "mock-text-v1"
+  },
+  "timing": {
+    "started_at": "2026-08-19T00:00:00.000Z",
+    "completed_at": "2026-08-19T00:00:00.005Z",
+    "duration_ms": 5
+  },
+  "finish_reason": "error",
+  "warnings": [],
+  "error": {
+    "category": "rate-limit",
+    "code": "PROVIDER_RATE_LIMIT",
+    "message": "The provider asked the caller to retry later.",
+    "retryable": true,
+    "stage": "provider",
+    "retry_after_ms": 1000,
+    "provider": {
+      "code": "synthetic_rate_limit",
+      "http_status": 429,
+      "request_id": "request-reference-0002"
+    }
+  }
+}
