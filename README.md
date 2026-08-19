@@ -48,6 +48,11 @@ The first prompt contract is the
 [Prompt Definition Specification v1.0.0](specs/prompt-contracts/prompt-definition-v1.md),
 with its JSON Schema and synthetic conformance fixtures.
 
+Provider-neutral model execution uses the
+[Provider Execution Contract v1.0.0](specs/execution-contracts/provider-execution-v1.md),
+covering adapter descriptors, requests/results, capability/parameter
+negotiation, extensions, and normalized errors.
+
 ## Authority and boundaries
 
 An accepted specification or schema in this repository is the source of truth

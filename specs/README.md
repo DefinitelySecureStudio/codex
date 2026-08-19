@@ -11,6 +11,8 @@ Initial contract families:
 - [`context-packages/`](context-packages/) — portable context boundaries;
 - [`prompt-contracts/`](prompt-contracts/) — prompt inputs, outputs, and
   invariants;
+- [`execution-contracts/`](execution-contracts/) — provider-neutral adapter,
+  request, result, capability, parameter, extension, and error contracts;
 - [`assets/`](assets/) — filenames, renditions, metadata, and provenance; and
 - [`taxonomies/`](taxonomies/) — controlled vocabularies and classifications.
 

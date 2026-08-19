@@ -1,0 +1,14 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "provider-adapter-descriptor",
+  "adapter": { "id": "studio.mock.text", "version": "1.0.0" },
+  "provider": { "id": "studio-mock" },
+  "model": { "id": "mock-text-v1" },
+  "execution_modes": ["synchronous"],
+  "capabilities": [
+    { "name": "text-generation", "implementation": "native" },
+    { "name": "text-generation", "implementation": "emulated" }
+  ],
+  "parameters": {},
+  "supported_extensions": []
+}

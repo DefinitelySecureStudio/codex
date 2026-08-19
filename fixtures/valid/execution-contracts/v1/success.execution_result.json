@@ -1,0 +1,37 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "execution-result",
+  "execution_id": "exec_reference_0001",
+  "correlation_id": "build_reference_0001",
+  "provider_request_id": "request-reference-0001",
+  "status": "succeeded",
+  "identity": {
+    "adapter_id": "studio.mock.text",
+    "adapter_version": "1.0.0",
+    "provider_id": "studio-mock",
+    "model_id": "mock-text-v1",
+    "model_revision": "synthetic-1"
+  },
+  "timing": {
+    "started_at": "2026-08-19T00:00:00.000Z",
+    "completed_at": "2026-08-19T00:00:00.012Z",
+    "duration_ms": 12
+  },
+  "finish_reason": "stop",
+  "usage": {
+    "provider_reported": true,
+    "input_tokens": 18,
+    "output_tokens": 4,
+    "total_tokens": 22
+  },
+  "warnings": [],
+  "output": {
+    "kind": "text",
+    "media_type": "text/plain",
+    "delivery": "inline",
+    "classification": "public",
+    "byte_size": 24,
+    "sha256": "sha256:ad56d367cf578d1295ce4a8b14d7ebb4357a1311f4fcd5e3d672a5d8f10f5d4a",
+    "content": "Synthetic mock response."
+  }
+}
