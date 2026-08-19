@@ -3,6 +3,7 @@
   "kind": "execution-result",
   "execution_id": "exec_reference_0001",
   "correlation_id": "build_reference_0001",
+  "provider_request_id": "request-reference-0001",
   "status": "succeeded",
   "identity": {
     "adapter_id": "studio.mock.text",

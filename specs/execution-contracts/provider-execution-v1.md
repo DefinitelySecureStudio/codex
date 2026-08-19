@@ -286,6 +286,11 @@ adapter version and available model revision. Identity comes from runtime facts,
 not model output or provider response content. A mismatch is an
 `invalid-provider-response` normalization failure.
 
+When the provider supplies a safe request identifier, the adapter preserves it
+as `provider_request_id` on success or in error provider details on failure. It
+is diagnostic/provenance correlation only and MUST NOT contain a credential or
+be treated as proof of idempotency.
+
 ### Timing
 
 `started_at` and `completed_at` are UTC/RFC 3339 timestamps recorded by the

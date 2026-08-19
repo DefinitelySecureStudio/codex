@@ -519,6 +519,7 @@
         "kind": { "const": "execution-result" },
         "execution_id": { "$ref": "#/$defs/safeId" },
         "correlation_id": { "$ref": "#/$defs/safeId" },
+        "provider_request_id": { "type": "string", "minLength": 1, "maxLength": 200 },
         "status": { "enum": ["succeeded", "failed", "cancelled", "timed-out"] },
         "identity": {
           "type": "object",
