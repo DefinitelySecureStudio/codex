@@ -161,6 +161,14 @@ intermediate created under issue #63. It includes definition/renderer identity,
 classification, ordered messages, value-free input/context provenance, canonical
 UTF-8 byte size, and SHA-256 digest.
 
+When context came from a Context Package v1 document, each context provenance
+entry additionally preserves exact package id/version/instance and manifest
+digest, section digest/source ids, and authorization decision id/reference.
+Those fields are value-free facts and MUST survive adapter translation. Raw
+context content and private source/evidence references remain only in rendered
+message bytes under their effective classification and MUST NOT be copied into
+provider metadata or public logs.
+
 The digest and byte size cover Studio canonical JSON v1 of the rendered prompt
 object before its `byte_size` and `sha256` wrapper fields are added. An executor
 MUST reconstruct and verify those bytes before negotiation. A mismatch is an

@@ -53,6 +53,11 @@ Provider-neutral model execution uses the
 covering adapter descriptors, requests/results, capability/parameter
 negotiation, extensions, and normalized errors.
 
+Prepared runtime context crosses the Context Builder/Prompt SDK boundary through
+[Context Package v1.0.0](specs/context-packages/context-package-v1.md), with
+exact content/source identity, time-bounded authorization, classification, and
+slot-binding semantics.
+
 ## Authority and boundaries
 
 An accepted specification or schema in this repository is the source of truth
