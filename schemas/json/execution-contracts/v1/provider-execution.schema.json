@@ -223,7 +223,7 @@
     "contextPackageProvenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["package", "section", "authorization"],
+      "required": ["package", "section", "sources", "authorization"],
       "properties": {
         "package": {
           "type": "object",
@@ -243,6 +243,21 @@
           "properties": {
             "sha256": { "$ref": "#/$defs/sha256" },
             "source_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/safeId" } }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_id", "kind", "version", "classification"],
+            "properties": {
+              "source_id": { "$ref": "#/$defs/safeId" },
+              "kind": { "enum": ["public-canon", "approved-private", "caller-supplied", "synthetic"] },
+              "version": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "classification": { "$ref": "#/$defs/classification" }
+            }
           }
         },
         "authorization": {

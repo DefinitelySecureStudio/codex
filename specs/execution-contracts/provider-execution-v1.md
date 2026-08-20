@@ -163,7 +163,8 @@ UTF-8 byte size, and SHA-256 digest.
 
 When context came from a Context Package v1 document, each context provenance
 entry additionally preserves exact package id/version/instance and manifest
-digest, section digest/source ids, and authorization decision id/reference.
+digest, section digest/source ids, referenced source id/kind/version/classification,
+and authorization decision id/reference.
 Those fields are value-free facts and MUST survive adapter translation. Raw
 context content and private source/evidence references remain only in rendered
 message bytes under their effective classification and MUST NOT be copied into

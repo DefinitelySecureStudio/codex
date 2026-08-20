@@ -151,7 +151,8 @@ the SDK MUST NOT parse text as JSON or stringify JSON as text implicitly.
 
 Source ids survive as value-free identities. At minimum each rendered context
 provenance record contains package id/version/instance, manifest digest,
-section digest/source ids, and authorization decision id/reference. This record
+section digest/source ids, each referenced source's id/kind/version/classification,
+and authorization decision id/reference. This record
 MUST survive unchanged into a Provider Execution request. Raw context content,
 private artifact URIs, source evidence, and authority internals MUST NOT be
 copied into logs or public provenance.
