@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:definitely-secure:contract:structured-output:1.0.0:processing",
+  "title": "Definitely Secure Studio Structured Output Contract v1.0.0",
+  "description": "Provider-neutral validated JSON results and explicit parse or validation failures.",
+  "oneOf": [
+    { "$ref": "#/$defs/structuredOutputResult" },
+    { "$ref": "#/$defs/structuredOutputFailure" }
+  ],
+  "$defs": {
+    "semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
+    },
+    "safeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$"
+    },
+    "namespace": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(?:\\.[a-z][a-z0-9-]*)+$",
+      "maxLength": 128
+    },
+    "classification": {
+      "enum": ["public", "internal", "confidential", "restricted"]
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "absoluteUri": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^[A-Za-z][A-Za-z0-9+.-]*:"
+    },
+    "artifactReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_uri", "media_type", "byte_size", "sha256"],
+      "properties": {
+        "artifact_uri": { "$ref": "#/$defs/absoluteUri" },
+        "media_type": { "type": "string", "pattern": "^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$" },
+        "byte_size": { "type": "integer", "minimum": 0 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "outputSchemaReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_id", "repository", "contract", "version", "tag", "commit", "artifact_uri", "media_type", "byte_size", "sha256"],
+      "properties": {
+        "schema_id": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "repository": { "type": "string", "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$" },
+        "contract": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "version": { "$ref": "#/$defs/semver" },
+        "tag": { "type": "string", "pattern": "^contract/[a-z0-9]+(?:-[a-z0-9]+)*/v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "artifact_uri": { "$ref": "#/$defs/absoluteUri" },
+        "media_type": { "const": "application/schema+json" },
+        "byte_size": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "expectation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "media_type", "validation"],
+      "properties": {
+        "kind": { "const": "json" },
+        "media_type": { "const": "application/json" },
+        "validation": { "enum": ["json-syntax", "json-schema"] },
+        "schema": { "$ref": "#/$defs/outputSchemaReference" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "validation": { "const": "json-schema" } }, "required": ["validation"] },
+          "then": { "required": ["schema"] },
+          "else": { "not": { "required": ["schema"] } }
+        }
+      ]
+    },
+    "rawOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["media_type", "classification", "retention", "byte_size", "sha256"],
+      "properties": {
+        "media_type": { "const": "application/json" },
+        "classification": { "$ref": "#/$defs/classification" },
+        "retention": { "enum": ["inline", "reference", "identity-only"] },
+        "byte_size": { "type": "integer", "minimum": 0 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "content": { "type": "string" },
+        "reference": { "$ref": "#/$defs/artifactReference" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "retention": { "const": "inline" } }, "required": ["retention"] },
+          "then": { "required": ["content"], "not": { "required": ["reference"] } },
+          "else": {
+            "if": { "properties": { "retention": { "const": "reference" } }, "required": ["retention"] },
+            "then": { "required": ["reference"], "not": { "required": ["content"] } },
+            "else": { "not": { "anyOf": [{ "required": ["content"] }, { "required": ["reference"] }] } }
+          }
+        }
+      ]
+    },
+    "normalizedOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["media_type", "canonicalization", "value", "byte_size", "sha256"],
+      "properties": {
+        "media_type": { "const": "application/json" },
+        "canonicalization": { "const": "studio-json-v1" },
+        "value": {},
+        "byte_size": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "validator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "algorithm", "json_schema_draft"],
+      "properties": {
+        "name": { "$ref": "#/$defs/namespace" },
+        "version": { "$ref": "#/$defs/semver" },
+        "algorithm": { "const": "parse-once-validate-v1" },
+        "json_schema_draft": { "const": "2020-12" }
+      }
+    },
+    "providerConstraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "capability", "independently_validated"],
+      "properties": {
+        "mode": { "enum": ["portable-only", "provider-native", "adapter-emulated"] },
+        "capability": { "const": "structured-output" },
+        "adapter_id": { "$ref": "#/$defs/namespace" },
+        "independently_validated": { "const": true }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "enum": ["provider-native", "adapter-emulated"] } }, "required": ["mode"] },
+          "then": { "required": ["adapter_id"] },
+          "else": { "not": { "required": ["adapter_id"] } }
+        }
+      ]
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "path"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{0,127}$" },
+        "message": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "path": { "type": "string", "pattern": "^(?:|(?:/(?:[^~/]|~0|~1)*)*)$" },
+        "keyword": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,127}$" }
+      }
+    },
+    "structuredOutputResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spec_version", "kind", "processing_id", "execution_id", "status", "expectation", "raw", "normalized", "validator", "provider_constraint"],
+      "properties": {
+        "spec_version": { "const": "1.0.0" },
+        "kind": { "const": "structured-output-result" },
+        "processing_id": { "$ref": "#/$defs/safeId" },
+        "execution_id": { "$ref": "#/$defs/safeId" },
+        "status": { "const": "validated" },
+        "expectation": { "$ref": "#/$defs/expectation" },
+        "raw": { "$ref": "#/$defs/rawOutput" },
+        "normalized": { "$ref": "#/$defs/normalizedOutput" },
+        "validator": { "$ref": "#/$defs/validator" },
+        "provider_constraint": { "$ref": "#/$defs/providerConstraint" }
+      }
+    },
+    "structuredOutputFailure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spec_version", "kind", "processing_id", "execution_id", "status", "stage", "expectation", "raw", "validator", "provider_constraint", "diagnostics"],
+      "properties": {
+        "spec_version": { "const": "1.0.0" },
+        "kind": { "const": "structured-output-failure" },
+        "processing_id": { "$ref": "#/$defs/safeId" },
+        "execution_id": { "$ref": "#/$defs/safeId" },
+        "status": { "const": "failed" },
+        "stage": { "enum": ["preflight", "raw-integrity", "schema-load", "schema-integrity", "parse", "schema-validation", "normalization", "internal"] },
+        "expectation": { "$ref": "#/$defs/expectation" },
+        "raw": { "$ref": "#/$defs/rawOutput" },
+        "validator": { "$ref": "#/$defs/validator" },
+        "provider_constraint": { "$ref": "#/$defs/providerConstraint" },
+        "diagnostics": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/diagnostic" } }
+      }
+    }
+  }
+}

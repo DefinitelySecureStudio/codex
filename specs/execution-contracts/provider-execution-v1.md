@@ -228,7 +228,9 @@ Text output uses `text/plain` and validation `none`. JSON output uses
 `application/json` and `json-syntax` or `json-schema`. `json-schema` requires a
 complete immutable schema artifact reference. Issue #68 owns parsing,
 validation, raw-versus-normalized retention, and any separately authorized
-repair behavior. A provider's “JSON mode” claim is not a validation pass.
+repair behavior through [Structured Output v1](../structured-output/structured-output-v1.md).
+The v1 baseline forbids implicit repair. A provider's “JSON mode” claim is not a
+validation pass.
 
 ### Deadline and cancellation
 

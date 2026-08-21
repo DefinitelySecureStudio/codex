@@ -1,0 +1,38 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "structured-output-failure",
+  "processing_id": "structured_reference_0002",
+  "execution_id": "exec_reference_0003",
+  "status": "failed",
+  "stage": "parse",
+  "expectation": {
+    "kind": "json",
+    "media_type": "application/json",
+    "validation": "json-syntax"
+  },
+  "raw": {
+    "media_type": "application/json",
+    "classification": "public",
+    "retention": "identity-only",
+    "byte_size": 11,
+    "sha256": "sha256:b9082f00e5b0bd2ebc8623ac67585ede5e79786a7a1fcc8d657fd4946a660b92"
+  },
+  "validator": {
+    "name": "studio.prompt-sdk",
+    "version": "0.1.0",
+    "algorithm": "parse-once-validate-v1",
+    "json_schema_draft": "2020-12"
+  },
+  "provider_constraint": {
+    "mode": "portable-only",
+    "capability": "structured-output",
+    "independently_validated": true
+  },
+  "diagnostics": [
+    {
+      "code": "STRUCTURED_OUTPUT_JSON_SYNTAX",
+      "message": "Raw output is not valid JSON.",
+      "path": ""
+    }
+  ]
+}

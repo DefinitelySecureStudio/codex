@@ -6,6 +6,10 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Added the Structured Output v1.0.0 candidate (new contract): RFC 0004,
+  validated result/failure schema, raw/normalized identity, exact schema
+  verification, retention and provider-constraint provenance, explicit failure
+  behavior, and synthetic fixtures.
 - Added the Context Package v1.0.0 candidate (new contract): RFC 0003, inline
   package/reference/authorization schema, exact content and source identity,
   classification/time/slot-binding rules, rendered execution provenance, and

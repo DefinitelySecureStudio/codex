@@ -305,8 +305,9 @@ before using it and MUST NOT substitute a branch, range, copied schema, or
 unverified registry object.
 
 JSON output without `schema` declares syntactically valid JSON only. JSON output
-with `schema` declares parse and schema validation. Issue #68 defines raw versus
-normalized result handling and failure behavior. A parse or validation failure
+with `schema` declares parse and schema validation. [Structured Output
+v1](../structured-output/structured-output-v1.md) defines raw versus normalized
+result handling and failure behavior. A parse or validation failure
 MUST remain explicit; missing values MUST NOT be fabricated.
 
 The output description does not grant truth, Canon, rights, accessibility,
