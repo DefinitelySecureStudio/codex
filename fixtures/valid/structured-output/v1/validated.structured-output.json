@@ -1,0 +1,54 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "structured-output-result",
+  "processing_id": "structured_reference_0001",
+  "execution_id": "exec_reference_0002",
+  "status": "validated",
+  "expectation": {
+    "kind": "json",
+    "media_type": "application/json",
+    "validation": "json-schema",
+    "schema": {
+      "schema_id": "urn:definitely-secure:contract:reference-facts:1.0.0:result",
+      "repository": "DefinitelySecureStudio/codex",
+      "contract": "reference-facts",
+      "version": "1.0.0",
+      "tag": "contract/reference-facts/v1.0.0",
+      "commit": "2222222222222222222222222222222222222222",
+      "artifact_uri": "https://example.invalid/definitely-secure/contracts/reference-facts-v1.0.0.json",
+      "media_type": "application/schema+json",
+      "byte_size": 771,
+      "sha256": "sha256:35381afb0b74539ba760c79711751ff138c79543ef6139bed3d5c2e9db164c8d"
+    }
+  },
+  "raw": {
+    "media_type": "application/json",
+    "classification": "public",
+    "retention": "inline",
+    "byte_size": 72,
+    "sha256": "sha256:19767f0c36a73fa4d69e5b817682b0ea56f2964b23e0343d5a8585c1ab2ad179",
+    "content": "{\"facts\":[{\"field\":\"color\",\"value\":\"blue\"}],\"unknown_fields\":[\"weight\"]}"
+  },
+  "normalized": {
+    "media_type": "application/json",
+    "canonicalization": "studio-json-v1",
+    "value": {
+      "facts": [{ "field": "color", "value": "blue" }],
+      "unknown_fields": ["weight"]
+    },
+    "byte_size": 72,
+    "sha256": "sha256:19767f0c36a73fa4d69e5b817682b0ea56f2964b23e0343d5a8585c1ab2ad179"
+  },
+  "validator": {
+    "name": "studio.prompt-sdk",
+    "version": "0.1.0",
+    "algorithm": "parse-once-validate-v1",
+    "json_schema_draft": "2020-12"
+  },
+  "provider_constraint": {
+    "mode": "provider-native",
+    "capability": "structured-output",
+    "adapter_id": "studio.mock.text",
+    "independently_validated": true
+  }
+}

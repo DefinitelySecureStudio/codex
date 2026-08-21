@@ -40,5 +40,6 @@ design keeps assembly replaceable and consumption deterministic/testable.
 ## Deferred
 
 Context selection/retrieval, signatures, encrypted transport, storage access,
-watching/renewal, optimization, embeddings, provider processing, structured
-output, durable provenance emission, and publication remain separate issues.
+watching/renewal, optimization, embeddings, provider processing, [structured
+output](0004-structured-output-v1.md), durable provenance emission, and
+publication remain separate contracts.

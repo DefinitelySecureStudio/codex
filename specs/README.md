@@ -13,6 +13,8 @@ Initial contract families:
   invariants;
 - [`execution-contracts/`](execution-contracts/) — provider-neutral adapter,
   request, result, capability, parameter, extension, and error contracts;
+- [`structured-output/`](structured-output/) — raw/normalized response,
+  schema-validation, retention, and failure contracts;
 - [`assets/`](assets/) — filenames, renditions, metadata, and provenance; and
 - [`taxonomies/`](taxonomies/) — controlled vocabularies and classifications.
 

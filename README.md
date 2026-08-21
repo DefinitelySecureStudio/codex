@@ -58,6 +58,11 @@ Prepared runtime context crosses the Context Builder/Prompt SDK boundary through
 exact content/source identity, time-bounded authorization, classification, and
 slot-binding semantics.
 
+Machine-readable model responses use
+[Structured Output v1.0.0](specs/structured-output/structured-output-v1.md),
+which preserves raw identity, canonical parsed data, independent schema
+validation, retention, and explicit failure provenance.
+
 ## Authority and boundaries
 
 An accepted specification or schema in this repository is the source of truth

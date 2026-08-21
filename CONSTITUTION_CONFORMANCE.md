@@ -6,15 +6,15 @@
 - Constitution tag: `constitution/v1.0.0`
 - Constitution commit: [`a9cc8a503aa30e17820edc62ac95f7cbe10e0564`](https://github.com/DefinitelySecureStudio/studio/commit/a9cc8a503aa30e17820edc62ac95f7cbe10e0564)
 - Status: `Conforming candidate` (effective after accountable-owner approval and merge of this contract pull request)
-- Assessed scope: the merged repository through Provider Execution v1 plus Context Package v1 schema, RFC, specification, versioning, package/reference/authorization semantics, execution provenance extension, and synthetic fixtures in the issue #67 candidate diff
-- Excluded scope: Context Builder and consumer implementations, signatures, storage/access enforcement, private packages, provider behavior, deployments, publications, and immutable contract release
+- Assessed scope: the merged repository through Context Package v1 plus Structured Output v1 schema, RFC, specification, versioning, raw/normalized identity, retention, independent validation, provider-constraint provenance, failure semantics, and synthetic fixtures in the issue #68 candidate diff
+- Excluded scope: Platform implementation, provider execution, schema publication/resolution, repair, restricted raw storage/access, business-semantic validation, downstream use, deployments, publications, and immutable contract release
 - Accountable owner: [`@andrewperis`](https://github.com/andrewperis), Codex maintainer
-- Assessment base revision and date: `6e604726683edb2898b5c15724a553bc0954e0dd`; issue #67 candidate diff assessed 2026-08-20
+- Assessment base revision and date: `89be2c64c65a267bdfbf79b3e089e9e40fe77f65`; issue #68 candidate diff assessed 2026-08-20
 - Checklist revision: `a9cc8a503aa30e17820edc62ac95f7cbe10e0564`
 - Applicable profiles: universal; repository and production-system; ADR, RFC, and stable-specification
-- Evidence: this record; Context Package schema/specification/RFC/fixtures and coordinated Platform consumer tests; GitHub settings verified 2026-08-17; Studio issue [#67](https://github.com/DefinitelySecureStudio/studio/issues/67); implementation pull requests
+- Evidence: this record; Structured Output schema/specification/RFC/fixtures and coordinated Platform consumer tests; GitHub settings verified 2026-08-17; Studio issue [#68](https://github.com/DefinitelySecureStudio/studio/issues/68); implementation pull requests
 - Active constitutional exceptions: None
-- Residual risk: package signatures, restricted evidence/storage access, and authorization producer assurance remain external; all contracts remain provisional until issue #72 publishes immutable artifacts
+- Residual risk: schema registry assurance, validation resource limits, and restricted raw evidence storage/access remain external; all contracts remain provisional until issue #72 publishes immutable artifacts
 - Next review: 2026-11-20, before the first contract release or private-package use, and on Constitution, contract authority, compatibility, schema, validator, dependency, visibility, owner, or security-boundary change
 
 Before merge this is a proposed record and the repository remains `Transition
@@ -31,6 +31,7 @@ restricted record with only a reader-safe reference here.
 | CX-3 | Minor | Resolved 2026-08-17 | Undocumented Projects was disabled; Wiki and Discussions remain disabled. |
 | CX-4 | Advisory | Narrowed | Machine-readable candidate contracts and fixtures exist, but immutable issue #72 releases remain required before production release. |
 | CX-5 | Major | Resolved in candidate | Context selection and consumption are separated; exact identities, explicit time/authorization, classification, source/version provenance, slot compatibility, and fail-closed behavior are normative. |
+| CX-6 | Major | Resolved in candidate | Raw response evidence and normalized JSON are distinct; exact schema bytes and independent validation are required; malformed/schema-invalid data fails explicitly; provider-native constraints cannot self-attest success. |
 
 ## Checklist evidence
 
@@ -63,20 +64,20 @@ order of the pinned checklist.
 | U10 | N/A | No generated creative work is produced. |
 | U11 | P | RFC/spec templates, change control, schemas, fixtures, versions, and immutable release tuples define provenance. |
 | U12 | P | Templates separate unresolved questions, limitations, validation, and compatibility from accepted facts. |
-| U13 | P | Canonical package/section identities and explicit evaluation time make consumption deterministic; no implicit clock, retrieval, search, or generation is allowed. |
+| U13 | P | Raw/schema byte identities, parse-once semantics, canonical normalized identity, and no implicit retrieval/repair make structured processing deterministic. |
 | U14 | N/A | No released bytes exist at the assessed revision. |
 | U15 | P | Protected Git history, RFC status, CODEOWNERS, and release requirements provide attributable evidence. |
 | U16 | P | Security and privacy sections, trust boundaries, failure behavior, and private reporting are required. |
 | U17 | P | Contracts require minimization and public fixtures; repository settings enforce review. |
 | U18 | P | README, CONTRIBUTING, SECURITY, and PR template prohibit secrets and protected context. |
-| U19 | P | Classification follows examples, fixtures, logs, schemas, and context-package representations. |
+| U19 | P | Classification follows raw and normalized representations, retention, fixtures, logs, schemas, and downstream handling. |
 | U20 | N/A | No provider integration or processing exists. |
 | U21 | P | CONTRIBUTING requires source, permission, license, notice, and rights-compatible third-party material. |
 | U22 | P | Sensitive disclosure and questionable contract security stop public handling and use private reporting. |
-| U23 | P | Context conformance is independently testable through exact schema, semantic invariants, synthetic fixtures, and coordinated consumer tests. |
+| U23 | P | Structured-output conformance is independently testable through exact schemas, semantic identities, valid/failure fixtures, and coordinated consumer tests. |
 | U24 | P | Schema validation is explicitly insufficient without human-readable agreement and owner review. |
 | U25 | P | Stable IDs, semantic versions, portable JSON/YAML, fixtures, and immutable bundles define durable control. |
-| U26 | P | Specifications must define a provider-neutral baseline and capability-specific extensions. |
+| U26 | P | Provider-native and emulated constraints remain adapter facts; the provider-neutral consumer independently parses and validates every successful result. |
 | U27 | P | Breaking changes require migration, compatibility window, consumer approvals, and rollback planning. |
 
 ### ADR, RFC, and stable-specification profile
@@ -104,13 +105,14 @@ order of the pinned checklist.
 
 | ID | Result | Evidence or rationale |
 | --- | --- | --- |
-| O1 | P | CX-1 through CX-5 are classified; no unresolved Blocker or Major remains in assessed scope. |
+| O1 | P | CX-1 through CX-6 are classified; no unresolved Blocker or Major remains in assessed scope. |
 | O2 | P | Candidate status is explicit; owner merge makes this assessed contract revision conforming. |
-| O3 | P | Approval covers only the assessed base revision plus the issue #67 candidate diff. |
+| O3 | P | Approval covers only the assessed base revision plus the issue #68 candidate diff. |
 | O4 | P | Date and material triggers are explicit above. |
 
 ## Approval
 
 The owner approves this exact assessment by reviewing and merging the contract
-pull request. No Context Builder, private package, authorization producer,
-consumer implementation, deployment, publication, or release inherits approval.
+pull request. No provider response, schema publication, restricted raw store,
+consumer implementation, downstream use, deployment, publication, or release
+inherits approval.
