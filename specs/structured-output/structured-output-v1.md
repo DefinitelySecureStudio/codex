@@ -92,6 +92,8 @@ mandatory fact that output was independently validated.
 A provider-native mode can constrain generation but cannot produce a validated
 core result by assertion. Adapters remain behind Provider Execution v1; no
 provider SDK type, response-format object, or vendor error crosses this contract.
+Native/emulated modes require `structured-output` in the execution request's
+required capabilities and MUST agree with capability-emulation provenance.
 
 ## Failures and diagnostics
 
