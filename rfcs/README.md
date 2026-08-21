@@ -24,3 +24,6 @@ RFC filenames use four-digit numbers and a concise kebab-case title:
 `NNNN-short-title.md`. Copy [`0000-template.md`](0000-template.md) when drafting
 a proposal. Allocate the next number when the pull request opens; numbers are
 never reused.
+
+Accepted candidates include Prompt Definition v1 (RFC 0001), Provider Execution
+v1 (RFC 0002), and Context Package v1 (RFC 0003).

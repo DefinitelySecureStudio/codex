@@ -1,0 +1,20 @@
+{
+  "spec_version": "1.0.0",
+  "kind": "context-package-reference",
+  "package": {
+    "id": "context-package.reference.synthetic",
+    "version": "1.0.0",
+    "instance_id": "ctxpkg_reference_0001"
+  },
+  "artifact": {
+    "artifact_uri": "https://artifacts.definitelysecure.studio/context-packages/synthetic/ctxpkg_reference_0001.json",
+    "media_type": "application/vnd.definitely-secure-studio.context-package+json",
+    "byte_size": 2143,
+    "sha256": "sha256:1ee7b0d26fe162feb2e0f848b5ce83fdd3338e565553b4566090ed371888c17c"
+  },
+  "manifest_identity": {
+    "canonicalization": "studio-json-v1",
+    "byte_size": 1427,
+    "sha256": "sha256:1c5b3e293a37898c045c4830c116545f52d38e87e40220b1733637b2ef734c2b"
+  }
+}

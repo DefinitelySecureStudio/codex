@@ -6,6 +6,10 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Added the Context Package v1.0.0 candidate (new contract): RFC 0003, inline
+  package/reference/authorization schema, exact content and source identity,
+  classification/time/slot-binding rules, rendered execution provenance, and
+  synthetic conformance fixtures.
 - Added the Provider Execution Contract v1.0.0 candidate (new contract): RFC
   0002, adapter/request/result schema, capability and portable parameter model,
   extension behavior, normalized error taxonomy, versioning, conformance record,

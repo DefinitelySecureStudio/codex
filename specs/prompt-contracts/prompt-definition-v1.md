@@ -198,11 +198,12 @@ definition declares placement and constraints only. It MUST NOT contain a Lore
 path, retrieve a source, assemble a package, renew approval, declassify content,
 or embed a runtime payload.
 
-The caller supplies an explicit Context Builder package/reference under issue
-#67. Runtime validation MUST check contract version, identity, integrity,
-classification, authorization, expiry/review, media type, and size before
-rendering. Missing or incompatible required context fails closed. Optional
-context omission produces no part content and remains explicit in provenance.
+The caller supplies an explicit [Context Package v1](../context-packages/context-package-v1.md)
+package/reference and matching authorization decision. Runtime validation MUST
+check contract version, identity, integrity, classification, authorization,
+expiry/review, media type, and size before rendering. Missing or incompatible
+required context fails closed. Optional context omission produces no part
+content and remains explicit in provenance.
 
 ## Template
 
