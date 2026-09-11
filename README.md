@@ -2,6 +2,9 @@
 
 Stable specifications and contracts for Definitely Secure Studio systems.
 
+The [Execution Provenance v1 candidate](specs/execution-provenance/README.md)
+defines metadata-only execution evidence and observer policy.
+
 > [!NOTE]
 > This repository defines contracts. It does not implement production software
 > and it does not own creative canon or private lore.

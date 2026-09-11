@@ -6,6 +6,14 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Hardened the unreleased Execution Provenance candidate after PR #9 review:
+  enforce identity policy, portable domains, status/finish relationships,
+  structured processing identity and timestamp formats; add 64 conformance cases.
+
+- Added Execution Provenance v1.0.0 (new candidate contract): metadata-only
+  records, canonical identity, classification-aware redaction, observer failure
+  isolation, RFC 0005, and synthetic conformance fixtures for issue #69.
+
 - Added the Structured Output v1.0.0 candidate (new contract): RFC 0004,
   validated result/failure schema, raw/normalized identity, exact schema
   verification, retention and provider-constraint provenance, explicit failure
