@@ -6,6 +6,10 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Prepared five Prompt SDK v1 contract bundles and release checklist for #72.
+- Corrected the unreleased Context Package v1 schema id to the standard URN;
+  payload validation semantics are unchanged and Platform pins must refresh.
+
 - Hardened the unreleased Execution Provenance candidate after PR #9 review:
   enforce identity policy, portable domains, status/finish relationships,
   structured processing identity and timestamp formats; add 64 conformance cases.

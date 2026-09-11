@@ -1,5 +1,17 @@
 # Constitution conformance record
 
+## Issue #72 release preparation — 2026-09-11
+
+Constitution v1.0.0 at `a9cc8a503aa30e17820edc62ac95f7cbe10e0564`
+continues to govern. Owner: @andrewperis. Candidate scope is the five-contract
+release catalog, deterministic exact-commit source bundling, publication
+checklist and unreleased Context Package schema-id normalization.
+No payload semantics change or new exception. The coordinated Platform pin
+and validator are regenerated and tested. Bundle tests verify reproducibility
+and every included byte identity; all artifacts are reviewed public sources.
+Owner merge, immutable publication and consumer adoption remain outstanding:
+this record does not declare the contracts released or Epic #4 complete.
+
 ## Issue #69 assessment — 2026-09-11
 
 PR #9 review follow-up: all five schema findings addressed with 64 passing
