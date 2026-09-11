@@ -2,6 +2,9 @@
 
 Stable specifications and contracts for Definitely Secure Studio systems.
 
+See the [Prompt SDK v1 release checklist](releases/README.md) and exact contract
+catalog for publication readiness and immutable artifact requirements.
+
 The [Execution Provenance v1 candidate](specs/execution-provenance/README.md)
 defines metadata-only execution evidence and observer policy.
 

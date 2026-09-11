@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "repository": "DefinitelySecureStudio/codex",
+  "constitution_commit": "a9cc8a503aa30e17820edc62ac95f7cbe10e0564",
+  "contracts": [
+    { "name": "prompt-definition", "schema": "schemas/json/prompt-contracts/v1/prompt-definition.schema.json" },
+    { "name": "provider-execution", "schema": "schemas/json/execution-contracts/v1/provider-execution.schema.json" },
+    { "name": "context-package", "schema": "schemas/json/context-packages/v1/context-package.schema.json" },
+    { "name": "structured-output", "schema": "schemas/json/structured-output/v1/structured-output.schema.json" },
+    { "name": "execution-provenance", "schema": "schemas/json/execution-provenance/v1/execution-provenance.schema.json" }
+  ]
+}

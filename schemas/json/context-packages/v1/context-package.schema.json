@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.definitelysecure.studio/context-packages/v1/context-package.schema.json",
+  "$id": "urn:definitely-secure:contract:context-package:1.0.0:context-package",
   "title": "Definitely Secure Studio Context Package v1",
   "oneOf": [
     { "$ref": "#/$defs/contextPackage" },
