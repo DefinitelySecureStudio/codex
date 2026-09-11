@@ -17,9 +17,19 @@ usage. Parameters are the numeric portable values after adapter defaults, when
 negotiation completed; `not-resolved` MUST distinguish preflight failure.
 Stop sequence bodies are omitted; only their count is recorded.
 
+Copied portable parameters retain Provider Execution v1 domains: positive integer
+`max_output_tokens`, temperature 0–2, top_p greater than 0 and at most 1, and
+integer seed 0–9007199254740991. Timestamps MUST be RFC 3339 date-time values;
+consumers MUST enable format assertion when validating this schema.
+Success permits stop, length, content-filter or unknown finish reasons. Failed
+and timed-out outcomes require error; cancelled requires cancelled.
+
 Validation outcomes contain status and counts only. Missing evidence is
 `not-run`, never a pass. Structured-output evidence must match the execution
 and expectation before its processing id/status can be copied.
+
+Completed structured-output states require a nonempty processing id; not-run
+forbids one. The schema enforces these state-dependent fields.
 
 `public-only` permits rendered/output byte identities and context slot/package/
 source identities only when the associated classification is public. Context
@@ -27,6 +37,11 @@ identities also require the overall rendered prompt to be public. `omit`
 suppresses all such identities. Non-public contexts contribute only to the
 redacted count. Identity fields must contain approved opaque identifiers;
 classification and syntactic validation cannot detect a secret disguised as an id.
+
+The schema forbids rendered/output identities and all context entries under
+`omit`. Every retained context and source classification MUST be public.
+Original input classifications are not carried in this projection: the producer
+must additionally check source evidence before emitting hashes or identities.
 
 Bodies, raw output, parsed values, references/URIs, authorization evidence,
 provider request ids, idempotency keys, stop strings, extension configuration,

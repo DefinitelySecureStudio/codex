@@ -1,0 +1,800 @@
+[
+  {
+    "name": "public baseline",
+    "valid": true,
+    "set": {},
+    "remove": []
+  },
+  {
+    "name": "omit with no identities",
+    "valid": true,
+    "set": {
+      "policy.content_identities": "omit"
+    },
+    "remove": [
+      "rendered",
+      "output"
+    ]
+  },
+  {
+    "name": "omit rejects rendered",
+    "valid": false,
+    "set": {
+      "policy.content_identities": "omit"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "omit rejects output",
+    "valid": false,
+    "set": {
+      "policy.content_identities": "omit"
+    },
+    "remove": [
+      "rendered"
+    ]
+  },
+  {
+    "name": "public context",
+    "valid": true,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "public",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "public"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "omit rejects context identities",
+    "valid": false,
+    "set": {
+      "policy.content_identities": "omit",
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "public",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "public"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": [
+      "rendered",
+      "output"
+    ]
+  },
+  {
+    "name": "reject context internal",
+    "valid": false,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "internal",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "public"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "reject source internal",
+    "valid": false,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "public",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "internal"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "reject context confidential",
+    "valid": false,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "confidential",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "public"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "reject source confidential",
+    "valid": false,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "public",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "confidential"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "reject context restricted",
+    "valid": false,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "restricted",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "public"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "reject source restricted",
+    "valid": false,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "public",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "restricted"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "reject context unknown",
+    "valid": false,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "unknown",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "public"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "reject source unknown",
+    "valid": false,
+    "set": {
+      "contexts": [
+        {
+          "slot": "approved_notes",
+          "classification": "public",
+          "package": {
+            "id": "context.synthetic",
+            "version": "1.0.0",
+            "instance_id": "ctx_1",
+            "manifest_sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "sources": [
+            {
+              "source_id": "source.synthetic",
+              "version": "1.0.0",
+              "kind": "synthetic",
+              "classification": "unknown"
+            }
+          ]
+        }
+      ]
+    },
+    "remove": []
+  },
+  {
+    "name": "reject max_output_tokens -1.5",
+    "valid": false,
+    "set": {
+      "parameters.max_output_tokens": -1.5
+    },
+    "remove": []
+  },
+  {
+    "name": "reject max_output_tokens 0",
+    "valid": false,
+    "set": {
+      "parameters.max_output_tokens": 0
+    },
+    "remove": []
+  },
+  {
+    "name": "reject max_output_tokens 1.5",
+    "valid": false,
+    "set": {
+      "parameters.max_output_tokens": 1.5
+    },
+    "remove": []
+  },
+  {
+    "name": "reject temperature -0.1",
+    "valid": false,
+    "set": {
+      "parameters.temperature": -0.1
+    },
+    "remove": []
+  },
+  {
+    "name": "reject temperature 2.1",
+    "valid": false,
+    "set": {
+      "parameters.temperature": 2.1
+    },
+    "remove": []
+  },
+  {
+    "name": "reject top_p 0",
+    "valid": false,
+    "set": {
+      "parameters.top_p": 0
+    },
+    "remove": []
+  },
+  {
+    "name": "reject top_p -1",
+    "valid": false,
+    "set": {
+      "parameters.top_p": -1
+    },
+    "remove": []
+  },
+  {
+    "name": "reject top_p 1.1",
+    "valid": false,
+    "set": {
+      "parameters.top_p": 1.1
+    },
+    "remove": []
+  },
+  {
+    "name": "reject seed -1",
+    "valid": false,
+    "set": {
+      "parameters.seed": -1
+    },
+    "remove": []
+  },
+  {
+    "name": "reject seed 0.5",
+    "valid": false,
+    "set": {
+      "parameters.seed": 0.5
+    },
+    "remove": []
+  },
+  {
+    "name": "reject seed 9007199254740992",
+    "valid": false,
+    "set": {
+      "parameters.seed": 9007199254740992
+    },
+    "remove": []
+  },
+  {
+    "name": "parameter lower bounds",
+    "valid": true,
+    "set": {
+      "parameters": {
+        "max_output_tokens": 1,
+        "temperature": 0,
+        "top_p": 0.01,
+        "seed": 0
+      }
+    },
+    "remove": []
+  },
+  {
+    "name": "parameter upper bounds",
+    "valid": true,
+    "set": {
+      "parameters": {
+        "max_output_tokens": 256,
+        "temperature": 2,
+        "top_p": 1,
+        "seed": 9007199254740991
+      }
+    },
+    "remove": []
+  },
+  {
+    "name": "succeeded / stop",
+    "valid": true,
+    "set": {
+      "status": "succeeded",
+      "finish_reason": "stop"
+    },
+    "remove": []
+  },
+  {
+    "name": "succeeded / length",
+    "valid": true,
+    "set": {
+      "status": "succeeded",
+      "finish_reason": "length"
+    },
+    "remove": []
+  },
+  {
+    "name": "succeeded / content-filter",
+    "valid": true,
+    "set": {
+      "status": "succeeded",
+      "finish_reason": "content-filter"
+    },
+    "remove": []
+  },
+  {
+    "name": "succeeded / unknown",
+    "valid": true,
+    "set": {
+      "status": "succeeded",
+      "finish_reason": "unknown"
+    },
+    "remove": []
+  },
+  {
+    "name": "succeeded / error",
+    "valid": false,
+    "set": {
+      "status": "succeeded",
+      "finish_reason": "error"
+    },
+    "remove": []
+  },
+  {
+    "name": "succeeded / cancelled",
+    "valid": false,
+    "set": {
+      "status": "succeeded",
+      "finish_reason": "cancelled"
+    },
+    "remove": []
+  },
+  {
+    "name": "failed / stop",
+    "valid": false,
+    "set": {
+      "status": "failed",
+      "finish_reason": "stop"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "failed / length",
+    "valid": false,
+    "set": {
+      "status": "failed",
+      "finish_reason": "length"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "failed / content-filter",
+    "valid": false,
+    "set": {
+      "status": "failed",
+      "finish_reason": "content-filter"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "failed / unknown",
+    "valid": false,
+    "set": {
+      "status": "failed",
+      "finish_reason": "unknown"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "failed / error",
+    "valid": true,
+    "set": {
+      "status": "failed",
+      "finish_reason": "error"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "failed / cancelled",
+    "valid": false,
+    "set": {
+      "status": "failed",
+      "finish_reason": "cancelled"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "cancelled / stop",
+    "valid": false,
+    "set": {
+      "status": "cancelled",
+      "finish_reason": "stop"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "cancelled / length",
+    "valid": false,
+    "set": {
+      "status": "cancelled",
+      "finish_reason": "length"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "cancelled / content-filter",
+    "valid": false,
+    "set": {
+      "status": "cancelled",
+      "finish_reason": "content-filter"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "cancelled / unknown",
+    "valid": false,
+    "set": {
+      "status": "cancelled",
+      "finish_reason": "unknown"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "cancelled / error",
+    "valid": false,
+    "set": {
+      "status": "cancelled",
+      "finish_reason": "error"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "cancelled / cancelled",
+    "valid": true,
+    "set": {
+      "status": "cancelled",
+      "finish_reason": "cancelled"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "timed-out / stop",
+    "valid": false,
+    "set": {
+      "status": "timed-out",
+      "finish_reason": "stop"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "timed-out / length",
+    "valid": false,
+    "set": {
+      "status": "timed-out",
+      "finish_reason": "length"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "timed-out / content-filter",
+    "valid": false,
+    "set": {
+      "status": "timed-out",
+      "finish_reason": "content-filter"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "timed-out / unknown",
+    "valid": false,
+    "set": {
+      "status": "timed-out",
+      "finish_reason": "unknown"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "timed-out / error",
+    "valid": true,
+    "set": {
+      "status": "timed-out",
+      "finish_reason": "error"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "timed-out / cancelled",
+    "valid": false,
+    "set": {
+      "status": "timed-out",
+      "finish_reason": "cancelled"
+    },
+    "remove": [
+      "output"
+    ]
+  },
+  {
+    "name": "validated processing id",
+    "valid": true,
+    "set": {
+      "structured_output": {
+        "status": "validated",
+        "processing_id": "processing_1"
+      }
+    },
+    "remove": []
+  },
+  {
+    "name": "validated missing processing id",
+    "valid": false,
+    "set": {
+      "structured_output": {
+        "status": "validated"
+      }
+    },
+    "remove": []
+  },
+  {
+    "name": "failed processing id",
+    "valid": true,
+    "set": {
+      "structured_output": {
+        "status": "failed",
+        "processing_id": "processing_1"
+      }
+    },
+    "remove": []
+  },
+  {
+    "name": "failed missing processing id",
+    "valid": false,
+    "set": {
+      "structured_output": {
+        "status": "failed"
+      }
+    },
+    "remove": []
+  },
+  {
+    "name": "not-run rejects processing id",
+    "valid": false,
+    "set": {
+      "structured_output": {
+        "status": "not-run",
+        "processing_id": "processing_1"
+      }
+    },
+    "remove": []
+  },
+  {
+    "name": "reject empty processing id",
+    "valid": false,
+    "set": {
+      "structured_output": {
+        "status": "validated",
+        "processing_id": ""
+      }
+    },
+    "remove": []
+  },
+  {
+    "name": "reject started_at later",
+    "valid": false,
+    "set": {
+      "timing.started_at": "later"
+    },
+    "remove": []
+  },
+  {
+    "name": "reject started_at 2026-02-30T00:00:00Z",
+    "valid": false,
+    "set": {
+      "timing.started_at": "2026-02-30T00:00:00Z"
+    },
+    "remove": []
+  },
+  {
+    "name": "reject started_at 2026-09-11",
+    "valid": false,
+    "set": {
+      "timing.started_at": "2026-09-11"
+    },
+    "remove": []
+  },
+  {
+    "name": "reject completed_at later",
+    "valid": false,
+    "set": {
+      "timing.completed_at": "later"
+    },
+    "remove": []
+  },
+  {
+    "name": "reject completed_at 2026-02-30T00:00:00Z",
+    "valid": false,
+    "set": {
+      "timing.completed_at": "2026-02-30T00:00:00Z"
+    },
+    "remove": []
+  },
+  {
+    "name": "reject completed_at 2026-09-11",
+    "valid": false,
+    "set": {
+      "timing.completed_at": "2026-09-11"
+    },
+    "remove": []
+  },
+  {
+    "name": "RFC3339 offset",
+    "valid": true,
+    "set": {
+      "timing.started_at": "2026-09-11T08:00:00-04:00",
+      "timing.completed_at": "2026-09-11T08:00:00-04:00"
+    },
+    "remove": []
+  }
+]

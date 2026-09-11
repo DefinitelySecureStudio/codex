@@ -2,6 +2,11 @@
 
 ## Issue #69 assessment — 2026-09-11
 
+PR #9 review follow-up: all five schema findings addressed with 64 passing
+schema conformance cases. Policy suppression, numeric domains, outcome pairing,
+processing identity and date-time format assertion are enforced. Platform's
+pinned consumer validator is refreshed in its coordinated existing PR #12.
+
 This assessment extends and supersedes the prior issue #68 scope below for the
 current candidate. Constitution v1.0.0 at
 `a9cc8a503aa30e17820edc62ac95f7cbe10e0564` remains the authority.
