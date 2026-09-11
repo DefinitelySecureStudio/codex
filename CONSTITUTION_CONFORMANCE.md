@@ -1,5 +1,23 @@
 # Constitution conformance record
 
+## Issue #69 assessment — 2026-09-11
+
+This assessment extends and supersedes the prior issue #68 scope below for the
+current candidate. Constitution v1.0.0 at
+`a9cc8a503aa30e17820edc62ac95f7cbe10e0564` remains the authority.
+Accountable owner: @andrewperis; status: Conforming candidate pending owner merge.
+Base revision: `7fe034e508fdda2c70eb111c0517e1fe115e818b`.
+
+Scope: Execution Provenance v1 candidate schema, RFC 0005, specification, redaction policy and synthetic fixtures.
+Evidence: Coordinated Platform suite: 74 passing tests, including public/non-public context projection, identity tampering, structured outcomes and observer failure isolation.
+No new constitutional exceptions. Public fixtures are synthetic. Body content,
+authorization and diagnostic strings are omitted; non-public content identities
+are suppressed. Sinks cannot change the provider result or trigger retries.
+Caller-owned opaque identifiers, production sink retention/access controls and
+immutable contract publication (#72) remain outside this candidate.
+The schema defines a new independent candidate contract; existing contracts are unchanged.
+Next review: before release or any security-boundary/dependency change.
+
 ## Constitutional alignment
 
 - Constitution: [Definitely Secure Studio Constitution v1.0.0](https://github.com/DefinitelySecureStudio/studio/tree/constitution/v1.0.0)

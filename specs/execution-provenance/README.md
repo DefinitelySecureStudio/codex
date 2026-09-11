@@ -22,7 +22,8 @@ Validation outcomes contain status and counts only. Missing evidence is
 and expectation before its processing id/status can be copied.
 
 `public-only` permits rendered/output byte identities and context slot/package/
-source identities only when the associated classification is public. `omit`
+source identities only when the associated classification is public. Context
+identities also require the overall rendered prompt to be public. `omit`
 suppresses all such identities. Non-public contexts contribute only to the
 redacted count. Identity fields must contain approved opaque identifiers;
 classification and syntactic validation cannot detect a secret disguised as an id.
