@@ -6,6 +6,11 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Added Context Builder 1.0.0 (new additive, unreleased contract family) for
+  Studio #76: RFC 0006, closed producer schemas, deterministic selection/assembly
+  semantics, protected lineage/public receipts and synthetic conformance cases.
+  No released Prompt SDK contract bytes change; no migration is required.
+
 - Prepared five Prompt SDK v1 contract bundles and release checklist for #72.
 - Corrected the unreleased Context Package v1 schema id to the standard URN;
   payload validation semantics are unchanged and Platform pins must refresh.
