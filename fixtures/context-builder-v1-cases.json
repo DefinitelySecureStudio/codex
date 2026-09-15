@@ -1,0 +1,454 @@
+[
+  {
+    "name": "unknown request field",
+    "layer": "schema",
+    "path": [
+      "request",
+      "allow"
+    ],
+    "value": true
+  },
+  {
+    "name": "unknown contract version",
+    "layer": "schema",
+    "path": [
+      "request",
+      "spec_version"
+    ],
+    "value": "2.0.0"
+  },
+  {
+    "name": "unknown selection policy",
+    "layer": "schema",
+    "path": [
+      "request",
+      "policy",
+      "selection"
+    ],
+    "value": "semantic-v1"
+  },
+  {
+    "name": "private source location forbidden",
+    "layer": "schema",
+    "path": [
+      "request",
+      "sources",
+      1,
+      "reference"
+    ],
+    "value": {
+      "kind": "public-artifact",
+      "artifact": {
+        "artifact_uri": "https://example.invalid/private",
+        "media_type": "application/json",
+        "byte_size": 1,
+        "sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  },
+  {
+    "name": "private kind cannot be public",
+    "layer": "schema",
+    "path": [
+      "request",
+      "sources",
+      1,
+      "classification"
+    ],
+    "value": "public"
+  },
+  {
+    "name": "nonopaque source id",
+    "layer": "schema",
+    "path": [
+      "request",
+      "sources",
+      1,
+      "source_id"
+    ],
+    "value": "private-repository-path"
+  },
+  {
+    "name": "negative budget",
+    "layer": "schema",
+    "path": [
+      "request",
+      "limits",
+      "total_content_bytes"
+    ],
+    "value": -1
+  },
+  {
+    "name": "ambiguous fragment unit",
+    "layer": "schema",
+    "path": [
+      "request",
+      "sources",
+      0,
+      "fragments",
+      0,
+      "fragment",
+      "pointer"
+    ],
+    "value": ""
+  },
+  {
+    "name": "unknown diagnostic detail forbidden",
+    "layer": "schema",
+    "path": [
+      "failed",
+      "diagnostics",
+      0,
+      "message"
+    ],
+    "value": "SYNTHETIC-PROTECTED-SENTINEL"
+  },
+  {
+    "name": "failure cannot carry package",
+    "layer": "schema",
+    "path": [
+      "failed",
+      "package"
+    ],
+    "value": {
+      "spec_version": "1.0.0",
+      "kind": "context-package",
+      "manifest": {
+        "package": {
+          "id": "context-package.reference.builder",
+          "version": "1.0.0",
+          "instance_id": "urn:uuid:00000000-0000-4000-8000-000000000064"
+        },
+        "builder": {
+          "id": "studio.reference.context-builder",
+          "version": "1.0.0"
+        },
+        "created_at": "2026-09-15T12:00:00Z",
+        "review_after": "2026-09-16T00:00:00Z",
+        "expires_at": "2026-09-17T00:00:00Z",
+        "purpose": "Prepare synthetic context for contract conformance.",
+        "authority_reference": "urn:uuid:00000000-0000-4000-8000-000000000063",
+        "classification": "internal",
+        "total_content_bytes": 57,
+        "sources": [
+          {
+            "source_id": "urn:uuid:00000000-0000-4000-8000-000000000001",
+            "kind": "synthetic",
+            "version": "urn:uuid:00000000-0000-4000-8000-000000000010",
+            "classification": "public",
+            "evidence_reference": "urn:uuid:00000000-0000-4000-8000-000000000020",
+            "artifact": {
+              "artifact_uri": "urn:uuid:00000000-0000-4000-8000-000000000041",
+              "media_type": "text/plain",
+              "byte_size": 24,
+              "sha256": "sha256:c847bf684b5aabe0ea2d290978d299a6060a8132a01bd03fd606d6bdbb465384"
+            }
+          },
+          {
+            "source_id": "urn:uuid:00000000-0000-4000-8000-000000000002",
+            "kind": "approved-private",
+            "version": "urn:uuid:00000000-0000-4000-8000-000000000011",
+            "classification": "internal",
+            "evidence_reference": "urn:uuid:00000000-0000-4000-8000-000000000021"
+          }
+        ],
+        "sections": [
+          {
+            "slot": "approved_notes",
+            "classification": "public",
+            "media_type": "text/plain",
+            "content": "Synthetic approved note.",
+            "byte_size": 24,
+            "sha256": "sha256:c847bf684b5aabe0ea2d290978d299a6060a8132a01bd03fd606d6bdbb465384",
+            "source_ids": [
+              "urn:uuid:00000000-0000-4000-8000-000000000001"
+            ]
+          },
+          {
+            "slot": "context_facts",
+            "classification": "internal",
+            "media_type": "application/json",
+            "content": {
+              "count": 1,
+              "facts": [
+                "synthetic"
+              ]
+            },
+            "byte_size": 33,
+            "sha256": "sha256:086a926808322e2c933c498209d220850d84c1366dc967ddd502417d1f33560f",
+            "source_ids": [
+              "urn:uuid:00000000-0000-4000-8000-000000000002"
+            ]
+          }
+        ]
+      },
+      "manifest_identity": {
+        "canonicalization": "studio-json-v1",
+        "byte_size": 1769,
+        "sha256": "sha256:a287bcbe601550c2a4df68b296c64d622591fc91aa5713e8ea6e2e6119f04eab"
+      }
+    }
+  },
+  {
+    "name": "prepared needs lineage",
+    "layer": "schema",
+    "path": [
+      "result",
+      "lineage"
+    ],
+    "value": []
+  },
+  {
+    "name": "public receipt forbids digest",
+    "layer": "schema",
+    "path": [
+      "receipt",
+      "sha256"
+    ],
+    "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  {
+    "name": "public receipt forbids correlation",
+    "layer": "schema",
+    "path": [
+      "receipt",
+      "correlation_id"
+    ],
+    "value": "urn:uuid:00000000-0000-4000-8000-000000000061"
+  },
+  {
+    "name": "unrelated prompt",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "target",
+      "version"
+    ],
+    "value": "2.0.0"
+  },
+  {
+    "name": "weakened required slot",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "slots",
+      0,
+      "required"
+    ],
+    "value": false
+  },
+  {
+    "name": "widened slot budget",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "slots",
+      0,
+      "max_bytes"
+    ],
+    "value": 101
+  },
+  {
+    "name": "source budget overflow",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "limits",
+      "total_source_bytes"
+    ],
+    "value": 1
+  },
+  {
+    "name": "candidate count overflow",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "limits",
+      "max_candidates"
+    ],
+    "value": 1
+  },
+  {
+    "name": "missing required selection",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "slots",
+      0,
+      "selection",
+      "candidates"
+    ],
+    "value": []
+  },
+  {
+    "name": "required per-slot overflow",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "slots",
+      0,
+      "max_bytes"
+    ],
+    "value": 1
+  },
+  {
+    "name": "required total overflow",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "limits",
+      "total_content_bytes"
+    ],
+    "value": 1
+  },
+  {
+    "name": "absent explicit candidate",
+    "layer": "semantic",
+    "path": [
+      "request",
+      "slots",
+      0,
+      "selection",
+      "candidates",
+      0,
+      "candidate_id"
+    ],
+    "value": "urn:uuid:00000000-0000-4000-8000-000000000099"
+  },
+  {
+    "name": "altered normalized content",
+    "layer": "semantic",
+    "path": [
+      "normalized",
+      0,
+      "candidates",
+      0,
+      "content"
+    ],
+    "value": "Unrelated synthetic note."
+  },
+  {
+    "name": "unrelated build result",
+    "layer": "semantic",
+    "path": [
+      "result",
+      "build_id"
+    ],
+    "value": "urn:uuid:00000000-0000-4000-8000-000000000099"
+  },
+  {
+    "name": "unrelated package purpose",
+    "layer": "semantic",
+    "path": [
+      "result",
+      "package",
+      "manifest",
+      "purpose"
+    ],
+    "value": "Another purpose"
+  },
+  {
+    "name": "unrelated result content",
+    "layer": "semantic",
+    "path": [
+      "result",
+      "package",
+      "manifest",
+      "sections",
+      0,
+      "content"
+    ],
+    "value": "Another result"
+  },
+  {
+    "name": "downgraded package",
+    "layer": "semantic",
+    "path": [
+      "result",
+      "package",
+      "manifest",
+      "classification"
+    ],
+    "value": "public"
+  },
+  {
+    "name": "downgraded section",
+    "layer": "semantic",
+    "path": [
+      "result",
+      "package",
+      "manifest",
+      "sections",
+      1,
+      "classification"
+    ],
+    "value": "public"
+  },
+  {
+    "name": "dangling lineage",
+    "layer": "semantic",
+    "path": [
+      "result",
+      "lineage",
+      0,
+      "candidates",
+      0,
+      "source_id"
+    ],
+    "value": "urn:uuid:00000000-0000-4000-8000-000000000099"
+  },
+  {
+    "name": "extended lifetime",
+    "layer": "semantic",
+    "path": [
+      "result",
+      "package",
+      "manifest",
+      "expires_at"
+    ],
+    "value": "2027-01-01T00:00:00Z"
+  },
+  {
+    "name": "stale result request binding",
+    "layer": "semantic",
+    "path": [
+      "result",
+      "request_identity",
+      "sha256"
+    ],
+    "value": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  {
+    "name": "wrong failure stage",
+    "layer": "failure",
+    "path": [
+      "failed",
+      "diagnostics",
+      0,
+      "stage"
+    ],
+    "value": "source"
+  },
+  {
+    "name": "wrong failure action",
+    "layer": "failure",
+    "path": [
+      "failed",
+      "diagnostics",
+      0,
+      "action"
+    ],
+    "value": "none"
+  },
+  {
+    "name": "optional omission cannot terminal-fail",
+    "layer": "failure",
+    "path": [
+      "failed",
+      "diagnostics",
+      0,
+      "code"
+    ],
+    "value": "OPTIONAL_EMPTY"
+  }
+]

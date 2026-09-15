@@ -1,5 +1,22 @@
 # Constitution conformance record
 
+## Issue #76 Context Builder contract candidate — 2026-09-15
+
+Owner: @andrewperis. Assessed base: `62e78b606986988518b9dc502c25ae1cd189684a`
+plus this candidate diff. Constitution/checklist: 1.0.0 at
+`a9cc8a503aa30e17820edc62ac95f7cbe10e0564`. Profiles: universal,
+ADR/RFC/stable specification, repository/production system.
+Evidence: RFC 0006, Context Builder specification and schema, synthetic fixtures,
+schema/relational conformance tests and the coordinated Platform compatibility PR.
+Findings: ownership, explicit preparation/use/publication boundaries, opaque
+private identifiers, byte budgets, deterministic identities, failure semantics
+and release ordering are defined without changing immutable v1 dependencies.
+No exception requested. Status: proposed, effective after owner review/merge.
+Excluded: production policy trust, readers, runtime Builder, real sources,
+retention/signing and release publication. Synthetic test decisions grant no access.
+Review before #77 or #86, and on classification, trust, identity, source exposure,
+selection, budget or downstream-interface changes.
+
 ## Issue #72 release preparation — 2026-09-11
 
 Constitution v1.0.0 at `a9cc8a503aa30e17820edc62ac95f7cbe10e0564`

@@ -2,6 +2,10 @@
 
 Stable specifications and contracts for Definitely Secure Studio systems.
 
+The unreleased [Context Builder v1 candidate](specs/context-builder/context-builder-v1.md)
+defines explicit preparation requests, source evidence, prepared results and
+public-safe receipt boundaries. It preserves released Context Package v1 bytes.
+
 See the [Prompt SDK v1 release checklist](releases/README.md) and exact contract
 catalog for publication readiness and immutable artifact requirements.
 

@@ -1,0 +1,893 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:definitely-secure:contract:context-builder:1.0.0:context-builder",
+  "title": "Context Builder v1 candidate",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/normalized"
+    },
+    {
+      "$ref": "#/$defs/result"
+    },
+    {
+      "$ref": "#/$defs/receipt"
+    }
+  ],
+  "$defs": {
+    "opaque": {
+      "type": "string",
+      "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "classification": {
+      "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/classification"
+    },
+    "identity": {
+      "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/contentIdentity"
+    },
+    "builder": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/namespace"
+        },
+        "version": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/semver"
+        }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "normalization",
+        "selection",
+        "assembly",
+        "conflicts",
+        "audit"
+      ],
+      "properties": {
+        "normalization": {
+          "const": "utf8-json-v1"
+        },
+        "selection": {
+          "enum": [
+            "explicit-v1",
+            "lexical-v1"
+          ]
+        },
+        "assembly": {
+          "const": "whole-candidate-v1"
+        },
+        "conflicts": {
+          "const": "fail"
+        },
+        "audit": {
+          "enum": [
+            "required",
+            "optional"
+          ]
+        }
+      }
+    },
+    "publicArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "artifact"
+      ],
+      "properties": {
+        "kind": {
+          "const": "public-artifact"
+        },
+        "artifact": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/artifactIdentity"
+        }
+      }
+    },
+    "opaqueArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "handle"
+      ],
+      "properties": {
+        "kind": {
+          "const": "opaque-artifact"
+        },
+        "handle": {
+          "$ref": "#/$defs/opaque"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "kind",
+        "version",
+        "classification",
+        "evidence_reference",
+        "authority_id",
+        "continuity_id",
+        "not_before",
+        "review_after",
+        "expires_at",
+        "media_type",
+        "reference",
+        "fragments"
+      ],
+      "properties": {
+        "source_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "kind": {
+          "enum": [
+            "public-canon",
+            "approved-private",
+            "caller-supplied",
+            "synthetic"
+          ]
+        },
+        "version": {
+          "$ref": "#/$defs/opaque"
+        },
+        "classification": {
+          "$ref": "#/$defs/classification"
+        },
+        "evidence_reference": {
+          "$ref": "#/$defs/opaque"
+        },
+        "authority_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "continuity_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "not_before": {
+          "$ref": "#/$defs/time"
+        },
+        "review_after": {
+          "$ref": "#/$defs/time"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "media_type": {
+          "enum": [
+            "text/plain",
+            "application/json"
+          ]
+        },
+        "reference": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/publicArtifact"
+            },
+            {
+              "$ref": "#/$defs/opaqueArtifact"
+            }
+          ]
+        },
+        "fragments": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/extraction"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "classification": {
+                "not": {
+                  "const": "public"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/opaqueArtifact"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "approved-private"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reference": {
+                "$ref": "#/$defs/opaqueArtifact"
+              },
+              "classification": {
+                "enum": [
+                  "internal",
+                  "confidential",
+                  "restricted"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "candidate_id"
+      ],
+      "properties": {
+        "source_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "candidate_id": {
+          "$ref": "#/$defs/opaque"
+        }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "required",
+        "accepted_classifications",
+        "media_type",
+        "max_bytes",
+        "selection"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/symbol"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "accepted_classifications": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/classification"
+          },
+          "uniqueItems": true
+        },
+        "media_type": {
+          "enum": [
+            "text/plain",
+            "application/json"
+          ]
+        },
+        "max_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "selection": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mode",
+                "candidates"
+              ],
+              "properties": {
+                "mode": {
+                  "const": "explicit-v1"
+                },
+                "candidates": {
+                  "type": "array",
+                  "minItems": 0,
+                  "maxItems": 10000,
+                  "items": {
+                    "$ref": "#/$defs/choice"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "mode",
+                "query",
+                "max_candidates"
+              ],
+              "properties": {
+                "mode": {
+                  "const": "lexical-v1"
+                },
+                "query": {
+                  "type": "string",
+                  "maxLength": 4096
+                },
+                "max_candidates": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec_version",
+        "kind",
+        "build_id",
+        "correlation_id",
+        "caller_id",
+        "purpose",
+        "preparation_reference",
+        "target",
+        "builder",
+        "package",
+        "evaluation_time",
+        "review_after",
+        "expires_at",
+        "max_classification",
+        "sources",
+        "authority_ids",
+        "continuity_id",
+        "slots",
+        "policy",
+        "limits"
+      ],
+      "properties": {
+        "spec_version": {
+          "const": "1.0.0"
+        },
+        "kind": {
+          "const": "context-build-request"
+        },
+        "build_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "correlation_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "caller_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "preparation_reference": {
+          "$ref": "#/$defs/opaque"
+        },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "version",
+            "identity"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/promptId"
+            },
+            "version": {
+              "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/semver"
+            },
+            "identity": {
+              "$ref": "#/$defs/identity"
+            }
+          }
+        },
+        "builder": {
+          "$ref": "#/$defs/builder"
+        },
+        "package": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/packageIdentity"
+        },
+        "evaluation_time": {
+          "$ref": "#/$defs/time"
+        },
+        "review_after": {
+          "$ref": "#/$defs/time"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/time"
+        },
+        "max_classification": {
+          "$ref": "#/$defs/classification"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "authority_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/opaque"
+          },
+          "uniqueItems": true
+        },
+        "continuity_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "slots": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/slot"
+          }
+        },
+        "policy": {
+          "$ref": "#/$defs/policy"
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "total_content_bytes",
+            "total_source_bytes",
+            "max_candidates"
+          ],
+          "properties": {
+            "total_content_bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "total_source_bytes": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "max_candidates": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          }
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "fragment",
+        "classification",
+        "content",
+        "byte_size",
+        "sha256"
+      ],
+      "properties": {
+        "candidate_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "fragment": {
+          "$ref": "#/$defs/fragment"
+        },
+        "classification": {
+          "$ref": "#/$defs/classification"
+        },
+        "content": {},
+        "byte_size": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sha256": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/sha256"
+        },
+        "claim_id": {
+          "$ref": "#/$defs/opaque"
+        }
+      }
+    },
+    "normalized": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec_version",
+        "kind",
+        "build_id",
+        "request_identity",
+        "source",
+        "normalization",
+        "candidates"
+      ],
+      "properties": {
+        "spec_version": {
+          "const": "1.0.0"
+        },
+        "kind": {
+          "const": "context-normalized-source"
+        },
+        "build_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "request_identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "normalization": {
+          "const": "utf8-json-v1"
+        },
+        "candidates": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/candidate"
+          }
+        }
+      }
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "code",
+        "action"
+      ],
+      "properties": {
+        "stage": {
+          "enum": [
+            "request",
+            "authorization",
+            "source",
+            "normalization",
+            "selection",
+            "assembly",
+            "lifecycle",
+            "audit",
+            "handoff"
+          ]
+        },
+        "code": {
+          "enum": [
+            "INVALID_REQUEST",
+            "UNSUPPORTED_VERSION",
+            "PREPARATION_DENIED",
+            "AUTHORITY_UNVERIFIABLE",
+            "SOURCE_UNAVAILABLE",
+            "SOURCE_INTEGRITY",
+            "INVALID_SOURCE",
+            "CONFLICT",
+            "REQUIRED_CONTEXT_MISSING",
+            "BUDGET_EXCEEDED",
+            "STALE_AUTHORITY",
+            "AUDIT_REQUIRED",
+            "CANCELLED",
+            "OPTIONAL_EMPTY",
+            "OPTIONAL_BUDGET",
+            "INELIGIBLE"
+          ]
+        },
+        "action": {
+          "enum": [
+            "repair-request",
+            "obtain-authorization",
+            "repair-source",
+            "resolve-conflict",
+            "increase-budget",
+            "rebuild",
+            "retry-audit",
+            "none"
+          ]
+        }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slot",
+        "candidates"
+      ],
+      "properties": {
+        "slot": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/symbol"
+        },
+        "candidates": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/choice"
+          }
+        }
+      }
+    },
+    "omission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slot",
+        "code"
+      ],
+      "properties": {
+        "slot": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/symbol"
+        },
+        "code": {
+          "enum": [
+            "OPTIONAL_EMPTY",
+            "OPTIONAL_BUDGET"
+          ]
+        }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec_version",
+        "kind",
+        "build_id",
+        "correlation_id",
+        "request_identity",
+        "status",
+        "diagnostics"
+      ],
+      "properties": {
+        "spec_version": {
+          "const": "1.0.0"
+        },
+        "kind": {
+          "const": "context-build-result"
+        },
+        "build_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "correlation_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "request_identity": {
+          "$ref": "#/$defs/identity"
+        },
+        "status": {
+          "enum": [
+            "prepared",
+            "failed"
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/diagnostic"
+          }
+        },
+        "package": {
+          "$ref": "urn:definitely-secure:contract:context-package:1.0.0:context-package#/$defs/contextPackage"
+        },
+        "lineage": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/lineage"
+          }
+        },
+        "omissions": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 10000,
+          "items": {
+            "$ref": "#/$defs/omission"
+          }
+        },
+        "evidence_reference": {
+          "$ref": "#/$defs/opaque"
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "status": {
+              "const": "prepared"
+            },
+            "diagnostics": {
+              "maxItems": 0
+            }
+          },
+          "required": [
+            "package",
+            "lineage",
+            "omissions",
+            "evidence_reference"
+          ]
+        },
+        {
+          "properties": {
+            "status": {
+              "const": "failed"
+            },
+            "diagnostics": {
+              "minItems": 1
+            }
+          },
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "package"
+                ]
+              },
+              {
+                "required": [
+                  "lineage"
+                ]
+              },
+              {
+                "required": [
+                  "omissions"
+                ]
+              },
+              {
+                "required": [
+                  "evidence_reference"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec_version",
+        "kind",
+        "attestation_reference"
+      ],
+      "properties": {
+        "spec_version": {
+          "const": "1.0.0"
+        },
+        "kind": {
+          "const": "context-build-public-receipt"
+        },
+        "attestation_reference": {
+          "$ref": "#/$defs/opaque"
+        }
+      }
+    },
+    "fragment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit"
+      ],
+      "properties": {
+        "unit": {
+          "enum": [
+            "utf8-byte-range",
+            "json-pointer"
+          ]
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "pointer": {
+          "type": "string",
+          "maxLength": 4096,
+          "pattern": "^(?:/(?:[^~/]|~[01])*)*$"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "start",
+            "end"
+          ],
+          "properties": {
+            "unit": {
+              "const": "utf8-byte-range"
+            }
+          },
+          "not": {
+            "required": [
+              "pointer"
+            ]
+          }
+        },
+        {
+          "required": [
+            "pointer"
+          ],
+          "properties": {
+            "unit": {
+              "const": "json-pointer"
+            }
+          },
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "start"
+                ]
+              },
+              {
+                "required": [
+                  "end"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "fragment"
+      ],
+      "properties": {
+        "candidate_id": {
+          "$ref": "#/$defs/opaque"
+        },
+        "fragment": {
+          "$ref": "#/$defs/fragment"
+        },
+        "claim_id": {
+          "$ref": "#/$defs/opaque"
+        }
+      }
+    }
+  }
+}
