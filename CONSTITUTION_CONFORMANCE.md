@@ -1,5 +1,15 @@
 # Constitution conformance record
 
+## Studio #86 release preparation — 2026-09-16
+
+Owner: @andrewperis. Constitution 1.0.0 at
+`a9cc8a503aa30e17820edc62ac95f7cbe10e0564`. Additive release tooling and
+documentation only; no normative or immutable byte changes, private data or new
+dependencies. Evidence: isolated release catalog, deterministic tests and explicit
+approval/download-verification gates in releases/context-builder-v1.md. Proposed
+until owner merge; actual publication, Platform adoption and epic closeout remain
+separate verified steps. No exception or publication authority inferred.
+
 ## Issue #76 Context Builder contract candidate — 2026-09-15
 
 Owner: @andrewperis. Assessed base: `62e78b606986988518b9dc502c25ae1cd189684a`

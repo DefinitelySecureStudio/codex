@@ -40,4 +40,26 @@ test('contract release bundles are reproducible and every file identity verifies
 test('release builder requires an explicit external destination', async () => {
   await assert.rejects(buildContractRelease(), /Provide a new output/);
   await assert.rejects(buildContractRelease(new URL('../', import.meta.url).pathname), /outside/);
+  await assert.rejects(buildContractRelease('/tmp/unused', '../untrusted'), /Unknown release catalog/);
+});
+
+test('Builder catalog publishes only the additive family with unchanged schema bytes', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'builder-release-test-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const first = join(root, 'first'), second = join(root, 'second');
+  const [manifest] = await buildContractRelease(first, 'context-builder-v1');
+  await buildContractRelease(second, 'context-builder-v1');
+  assert.equal(manifest.tag, 'contract/context-builder/v1.0.0');
+  assert.equal(manifest.assets[0].sha256, 'sha256:4adebedcef5a26e009e1d53ec9c480d372a31b73211fec1c53d6509ebc7929a3');
+  assert.equal((await readdir(first)).length, 3);
+  for (const file of await readdir(first)) assert.deepEqual(await readFile(join(first, file)), await readFile(join(second, file)));
+  for (const asset of manifest.assets) {
+    const bytes = await readFile(join(first, asset.filename));
+    assert.equal(bytes.length, asset.byte_size); assert.equal(hash(bytes), asset.sha256);
+  }
+  const bundle = JSON.parse(await readFile(join(first, manifest.assets[1].filename)));
+  assert.equal(bundle.commit, manifest.commit);
+  for (const path of ['LICENSE', 'NOTICE', 'specs/context-builder/context-builder-v1.md', 'releases/context-builder-v1.md']) {
+    assert.ok(bundle.files.some(file => file.path === path));
+  }
 });

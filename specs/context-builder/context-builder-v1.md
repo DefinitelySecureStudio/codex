@@ -1,6 +1,7 @@
 # Context Builder v1
 
 Candidate 1.0.0, accepted by owner merge; **unreleased, not a production dependency**.
+Publication is gated by the [#86 release checklist](../../releases/context-builder-v1.md).
 Owner: @andrewperis. [RFC 0006](../../rfcs/0006-context-builder-v1.md).
 [Studio #76](https://github.com/DefinitelySecureStudio/studio/issues/76).
 Governed by [Studio ADR 0017](https://github.com/DefinitelySecureStudio/studio/blob/main/adr/0017-context-builder-architecture.md)
