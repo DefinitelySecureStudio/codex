@@ -2,6 +2,10 @@
 
 Stable specifications and contracts for Definitely Secure Studio systems.
 
+The proposed [Comic Manifest v1](specs/manifests/comic-manifest-v1.md) separates
+production, build-result and public release payloads with exact detached approvals.
+See its [conformance fixtures](fixtures/comic-manifest-v1.md) for validation commands.
+
 The unreleased [Context Builder v1 candidate](specs/context-builder/context-builder-v1.md)
 defines explicit preparation requests, source evidence, prepared results and
 public-safe receipt boundaries. It preserves released Context Package v1 bytes.

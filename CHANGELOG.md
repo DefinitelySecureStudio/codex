@@ -11,6 +11,12 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Added Comic Manifest 1.0.0 (new additive, unreleased family) for Studio #89:
+  RFC 0007, three closed record schemas, detached approval bindings, normative
+  identity/privacy/compatibility semantics and offline synthetic conformance.
+  Added pinned development test dependencies and CI for contract conformance.
+  Released Prompt SDK, Context Package and Context Builder bytes are unchanged.
+
 - Added Context Builder 1.0.0 (new additive, unreleased contract family) for
   Studio #76: RFC 0006, closed producer schemas, deterministic selection/assembly
   semantics, protected lineage/public receipts and synthetic conformance cases.
