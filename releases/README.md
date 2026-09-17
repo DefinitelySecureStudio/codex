@@ -1,5 +1,9 @@
 # Prompt SDK v1 release checklist
 
+For the additive Context Builder family use the independent
+[#86 checklist](context-builder-v1.md) and explicit `context-builder-v1` catalog.
+The historical five-contract catalog below must not be republished at its existing tags.
+
 Owner: @andrewperis. This is issue #72 release preparation, not evidence that
 the contracts are already published. Existing provisional notices remain true
 until the steps below complete. No release or tag is created by the builder.

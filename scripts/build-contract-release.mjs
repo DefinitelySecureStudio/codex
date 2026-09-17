@@ -6,13 +6,14 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 16 * 1024 * 1024 });
 const sha = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex');
-export async function buildContractRelease(destination) {
+export async function buildContractRelease(destination, catalogName = 'prompt-sdk-v1') {
+  if (!['prompt-sdk-v1', 'context-builder-v1'].includes(catalogName)) throw new Error('Unknown release catalog.');
   if (!destination) throw new Error('Provide a new output directory outside the checkout.');
   const output = resolve(destination), rel = relative(root, output);
   if (!rel || (!rel.startsWith('..' + '/') && !isAbsolute(rel))) throw new Error('Output must be outside the checkout.');
   if (git('status', '--porcelain').length) throw new Error('Commit or remove working-tree changes before building.');
   const commit = git('rev-parse', 'HEAD').toString().trim();
-  const catalog = JSON.parse(git('show', commit + ':releases/prompt-sdk-v1.json'));
+  const catalog = JSON.parse(git('show', commit + ':releases/' + catalogName + '.json'));
   const files = git('ls-tree', '-r', '--name-only', '-z', commit).toString().split('\0').filter(Boolean).sort();
   const entries = files.map(path => {
     const bytes = git('show', commit + ':' + path);
@@ -41,5 +42,5 @@ export async function buildContractRelease(destination) {
   return releases;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  console.log(JSON.stringify(await buildContractRelease(process.argv[2]), null, 2));
+  console.log(JSON.stringify(await buildContractRelease(process.argv[2], process.argv[3]), null, 2));
 }

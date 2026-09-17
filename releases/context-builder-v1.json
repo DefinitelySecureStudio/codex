@@ -1,0 +1,8 @@
+{
+  "version": "1.0.0",
+  "repository": "DefinitelySecureStudio/codex",
+  "constitution_commit": "a9cc8a503aa30e17820edc62ac95f7cbe10e0564",
+  "contracts": [
+    { "name": "context-builder", "schema": "schemas/json/context-builder/v1/context-builder.schema.json" }
+  ]
+}
