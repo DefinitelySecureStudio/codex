@@ -24,9 +24,10 @@ versions/fields, ordered identities, immutable references, package bindings,
 stale/revoked/forged approvals, approval-time boundaries, public gates and
 private-context projection. The [approval-time fixture matrix](comic-manifest-v1-approval-times.json)
 covers inclusive decision equality, just-before and equal expiry at both action
-and publication time, future decisions, submillisecond boundaries, and equal
-instants with different fractional widths. Tests
-compose non-rendered image/PDF placeholder bytes to exercise declared profile
+and publication time, future decisions, submillisecond boundaries, equal
+instants with different fractional widths, and equivalent instants using the
+uppercase `T`, lowercase `t`, or a single whitespace separator accepted by the schema.
+The tests compose non-rendered image/PDF placeholder bytes to exercise declared profile
 relationships; they deliberately do not claim media signatures or rendering.
 Output text bytes and public dependency bytes are explicit fixture inputs and
 independently hashed. Tests never create an approval from a production runtime or

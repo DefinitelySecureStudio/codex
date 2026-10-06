@@ -94,5 +94,29 @@
     "decided_at": "2026-09-15T12:10:00.0009Z",
     "expires_at": "2026-09-15T12:10:00.0010Z",
     "valid": false
+  },
+  {
+    "name": "equivalent instants across accepted timestamp separators remain valid",
+    "action_time": "2026-09-15t12:10:00.0001000Z",
+    "publication_time": "2026-09-15\t12:10:00.00010Z",
+    "decided_at": "2026-09-15 12:10:00.0001Z",
+    "expires_at": "2026-09-15T12:10:00.00011Z",
+    "valid": true
+  },
+  {
+    "name": "action at expiry is expired across accepted timestamp separators",
+    "action_time": "2026-09-15 12:10:00.0001000Z",
+    "publication_time": "2026-09-15T12:09:59.999Z",
+    "decided_at": "2026-09-15t12:02:00Z",
+    "expires_at": "2026-09-15t12:10:00.0001Z",
+    "valid": false
+  },
+  {
+    "name": "publication at expiry is expired across accepted timestamp separators",
+    "action_time": "2026-09-15T12:09:59.999999Z",
+    "publication_time": "2026-09-15t12:10:00.0001000Z",
+    "decided_at": "2026-09-15T12:02:00Z",
+    "expires_at": "2026-09-15 12:10:00.0001Z",
+    "valid": false
   }
 ]

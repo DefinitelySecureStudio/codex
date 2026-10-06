@@ -8,12 +8,13 @@ const unique = (xs, code) => eq(new Set(xs).size, xs.length, code);
 const rank = c => ['public', 'internal', 'confidential', 'restricted'].indexOf(c);
 const gates = ['editorial', 'canon-continuity', 'visual-text', 'integrity', 'provenance', 'security-privacy', 'rights', 'accessibility', 'packaging'];
 function compareUtcInstants(left, right) {
-  const parse = value => /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?Z$/.exec(value);
+  const parse = value => /^(\d{4}-\d{2}-\d{2})[Tt\s](\d{2}:\d{2}:\d{2})(?:\.(\d+))?Z$/.exec(value);
   const a = parse(left), b = parse(right);
   check(a && b, 'APPROVAL_TIME');
-  if (a[1] !== b[1]) return a[1] < b[1] ? -1 : 1;
-  const width = Math.max(a[2]?.length ?? 0, b[2]?.length ?? 0);
-  const af = (a[2] ?? '').padEnd(width, '0'), bf = (b[2] ?? '').padEnd(width, '0');
+  const aWholeSecond = `${a[1]}T${a[2]}`, bWholeSecond = `${b[1]}T${b[2]}`;
+  if (aWholeSecond !== bWholeSecond) return aWholeSecond < bWholeSecond ? -1 : 1;
+  const width = Math.max(a[3]?.length ?? 0, b[3]?.length ?? 0);
+  const af = (a[3] ?? '').padEnd(width, '0'), bf = (b[3] ?? '').padEnd(width, '0');
   return af < bf ? -1 : af > bf ? 1 : 0;
 }
 const renditionProfiles = {
