@@ -26,6 +26,38 @@ function rebind(s) {
   s.trust.approvals = s.approvals.map(a=>({ decision_id:a.decision_id, sha256:identity(a).sha256 }));
   if (s.trust.attestation) s.trust.attestation.linkage_identity = identity(s.linkage);
 }
+function addSyntheticOutput(s, { renditionId, profileId, mediaType, dimensions, placeholder, maxBytes }) {
+  const raw = placeholder;
+  const req = {
+    rendition_id: renditionId, required: true,
+    profile: { profile_id: profileId, profile_version: '1.0.0' },
+    media_type: mediaType, dimensions, max_bytes: maxBytes ?? Buffer.byteLength(raw),
+    alt_text: 'Synthetic accessibility description.',
+    transcript: s.production.renditions[0].transcript,
+    rights_notice: 'Synthetic fixture; no rights assertion.'
+  };
+  s.production.renditions.push(req);
+  s.output_bytes[renditionId] = raw;
+  const digest = sha(raw);
+  const output = {
+    rendition_id: renditionId,
+    artifact: {
+      artifact_uri: 'urn:uuid:10000000-0000-4000-8000-000000000011',
+      media_type: mediaType, byte_size: Buffer.byteLength(raw), sha256: digest
+    },
+    profile: structuredClone(req.profile), dimensions: structuredClone(dimensions),
+    max_bytes: req.max_bytes, alt_text: req.alt_text,
+    transcript: req.transcript, rights_notice: req.rights_notice
+  };
+  s.result.outputs.push(output);
+  s.release.outputs.push({ ...structuredClone(output), artifact: {
+    ...output.artifact, artifact_uri: `https://example.invalid/synthetic/${renditionId}`
+  } });
+  s.result.execution.transformations[0].output_digests.push(digest);
+  s.release.execution.transformations[0].output_digests.push(digest);
+  rebind(s);
+  return s;
+}
 test('synthetic three-record slice and detached approvals validate', () => { schemaValid(base); verifyScenario(base, foundation); });
 test('every structured object is closed', () => {
   function walk(x) {
@@ -97,6 +129,70 @@ test('released foundation schema identities remain unchanged', () => {
 test('missing one required rendition fails even with another valid output', () => {
   const s=structuredClone(base);s.production.renditions.push({...s.production.renditions[0],rendition_id:'second-required'});rebind(s);schemaValid(s);
   assert.throws(()=>verifyScenario(s,foundation),/REQUIRED_OUTPUT/);
+});
+test('versioned image/document profiles accept their exact media, pixel and byte boundaries', () => {
+  // Placeholder output bytes intentionally do not claim to be rendered media.
+  const image = addSyntheticOutput(structuredClone(base), {
+    renditionId: 'page', profileId: 'comic-page-image', mediaType: 'image/png',
+    dimensions: { width: 8192, height: 4096 }, placeholder: 'SYNTHETIC-IMAGE-PLACEHOLDER'
+  });
+  schemaValid(image); verifyScenario(image, foundation);
+  const document = addSyntheticOutput(structuredClone(base), {
+    renditionId: 'document', profileId: 'comic-portable-document', mediaType: 'application/pdf',
+    dimensions: null, placeholder: 'SYNTHETIC-DOCUMENT-PLACEHOLDER', maxBytes: 50_000_000
+  });
+  schemaValid(document); verifyScenario(document, foundation);
+});
+test('raster profiles reject side and pixel limits just above their inclusive boundary', () => {
+  for (const dimensions of [{ width: 8192, height: 4097 }, { width: 8193, height: 1 }]) {
+    const s = addSyntheticOutput(structuredClone(base), {
+      renditionId: 'page', profileId: 'comic-page-image', mediaType: 'image/png',
+      dimensions, placeholder: 'SYNTHETIC-IMAGE-PLACEHOLDER'
+    });
+    schemaValid(s); assert.throws(() => verifyScenario(s, foundation), /RENDITION_DIMENSIONS/);
+  }
+});
+test('actual artifact bytes cannot exceed the declared rendition cap', () => {
+  const size = Buffer.byteLength('SYNTHETIC-IMAGE-PLACEHOLDER');
+  const exact = addSyntheticOutput(structuredClone(base), {
+    renditionId: 'page', profileId: 'comic-page-image', mediaType: 'image/webp',
+    dimensions: { width: 1, height: 1 }, placeholder: 'SYNTHETIC-IMAGE-PLACEHOLDER', maxBytes: size
+  });
+  schemaValid(exact); verifyScenario(exact, foundation);
+  const over = addSyntheticOutput(structuredClone(base), {
+    renditionId: 'page', profileId: 'comic-page-image', mediaType: 'image/webp',
+    dimensions: { width: 1, height: 1 }, placeholder: 'SYNTHETIC-IMAGE-PLACEHOLDER', maxBytes: size - 1
+  });
+  schemaValid(over); assert.throws(() => verifyScenario(over, foundation), /OUTPUT_LIMIT/);
+});
+test('complete result rejects a missing required output and duplicate output IDs', () => {
+  const missing = addSyntheticOutput(structuredClone(base), {
+    renditionId: 'page', profileId: 'comic-page-image', mediaType: 'image/png',
+    dimensions: { width: 1, height: 1 }, placeholder: 'SYNTHETIC-IMAGE-PLACEHOLDER'
+  });
+  missing.result.outputs.pop(); rebind(missing); schemaValid(missing);
+  assert.throws(() => verifyScenario(missing, foundation), /REQUIRED_OUTPUT/);
+  const duplicate = addSyntheticOutput(structuredClone(base), {
+    renditionId: 'page', profileId: 'comic-page-image', mediaType: 'image/png',
+    dimensions: { width: 1, height: 1 }, placeholder: 'SYNTHETIC-IMAGE-PLACEHOLDER'
+  });
+  duplicate.result.outputs.push(structuredClone(duplicate.result.outputs.at(-1)));
+  rebind(duplicate); schemaValid(duplicate);
+  assert.throws(() => verifyScenario(duplicate, foundation), /OUTPUT_ID/);
+});
+test('public release preserves exact selected output profile and metadata', () => {
+  const s = structuredClone(base);
+  s.release.outputs[0].profile.profile_id = 'comic-page-image';
+  rebind(s); schemaValid(s);
+  assert.throws(() => verifyScenario(s, foundation), /RELEASE_OUTPUTS/);
+});
+test('profile and accessibility fields cannot be omitted from any rendition/output record', () => {
+  for (const [kind, record] of [['production', 'renditions'], ['result', 'outputs'], ['release', 'outputs']]) {
+    for (const field of ['profile', 'max_bytes', 'alt_text', 'transcript', 'rights_notice']) {
+      const s = structuredClone(base); delete s[kind][record][0][field];
+      assert.equal(validate(s[kind]), false, `${kind}.${record}.${field}`);
+    }
+  }
 });
 test('public asset references resolve and contribute exact public dependencies', () => {
   const s=structuredClone(base);s.production.inputs.assets=[{asset_id:'synthetic-asset',classification:'public',reference:{kind:'public',dependency:s.production.inputs.canon},rights_notice:'Synthetic fixture.'}];
