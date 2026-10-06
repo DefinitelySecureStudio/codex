@@ -13,8 +13,10 @@ compatible, or editorial.
 
 - Clarified the unreleased Comic Manifest 1.0.0 candidate's (#95 prerequisite)
   detached approval time bounds: decision time is inclusive, expiry is exclusive
-  at both action and scoped publication time. Added synthetic boundary fixtures
-  and focused conformance coverage; no released contract bytes change.
+  at both action and scoped publication time. The test-only oracle preserves
+  submillisecond precision across variable fractional widths. Synthetic boundary
+  fixtures cover equal instants, expiry and future decisions; no released contract
+  bytes change.
 
 - Extended the unreleased Comic Manifest 1.0.0 candidate for Studio #94 with
   immutable versioned output profiles, per-output limits, exact requirement/result/

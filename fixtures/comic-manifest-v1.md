@@ -23,8 +23,9 @@ duplicate and undeclared outputs, accessibility/rights metadata mismatch, unknow
 versions/fields, ordered identities, immutable references, package bindings,
 stale/revoked/forged approvals, approval-time boundaries, public gates and
 private-context projection. The [approval-time fixture matrix](comic-manifest-v1-approval-times.json)
-covers inclusive decision equality, valid action/publication just before expiry,
-expiry equality at either time, and a future decision. Tests
+covers inclusive decision equality, just-before and equal expiry at both action
+and publication time, future decisions, submillisecond boundaries, and equal
+instants with different fractional widths. Tests
 compose non-rendered image/PDF placeholder bytes to exercise declared profile
 relationships; they deliberately do not claim media signatures or rendering.
 Output text bytes and public dependency bytes are explicit fixture inputs and

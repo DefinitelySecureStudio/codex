@@ -7,6 +7,15 @@ const check = (v, code) => assert.ok(v, code);
 const unique = (xs, code) => eq(new Set(xs).size, xs.length, code);
 const rank = c => ['public', 'internal', 'confidential', 'restricted'].indexOf(c);
 const gates = ['editorial', 'canon-continuity', 'visual-text', 'integrity', 'provenance', 'security-privacy', 'rights', 'accessibility', 'packaging'];
+function compareUtcInstants(left, right) {
+  const parse = value => /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?Z$/.exec(value);
+  const a = parse(left), b = parse(right);
+  check(a && b, 'APPROVAL_TIME');
+  if (a[1] !== b[1]) return a[1] < b[1] ? -1 : 1;
+  const width = Math.max(a[2]?.length ?? 0, b[2]?.length ?? 0);
+  const af = (a[2] ?? '').padEnd(width, '0'), bf = (b[2] ?? '').padEnd(width, '0');
+  return af < bf ? -1 : af > bf ? 1 : 0;
+}
 const renditionProfiles = {
   'comic-page-image@1.0.0': { media: ['image/png', 'image/jpeg', 'image/webp'], maxBytes: 50_000_000, image: true },
   'comic-portable-document@1.0.0': { media: ['application/pdf'], maxBytes: 50_000_000, image: false },
@@ -96,9 +105,9 @@ function verifyApproval(a, subject, artifacts, scope, s) {
   eq(a.subject, identity(subject), 'APPROVAL_SUBJECT');
   eq(a.artifact_digests, artifacts.map(x => x.artifact.sha256).sort(), 'APPROVAL_ARTIFACTS');
   eq(a.scope, scope, 'APPROVAL_SCOPE');
-  const at = Date.parse(s.at);
-  // Decision time is inclusive; expiry is exclusive at both action and scoped publication time.
-  check(Date.parse(a.decided_at) <= at && at < Date.parse(a.expires_at) && Date.parse(scope.publication_time) < Date.parse(a.expires_at), 'APPROVAL_TIME');
+  // Preserve arbitrary schema-valid fractional precision at each approval boundary.
+  check(compareUtcInstants(a.decided_at, s.at) <= 0 && compareUtcInstants(s.at, a.expires_at) < 0 &&
+    compareUtcInstants(scope.publication_time, a.expires_at) < 0, 'APPROVAL_TIME');
   // A test harness supplies trusted decisions OUTSIDE untrusted record bytes.
   const trusted = s.trust.approvals.find(x => x.decision_id === a.decision_id);
   check(trusted && trusted.sha256 === identity(a).sha256 && !s.trust.revoked.includes(a.decision_id), 'APPROVAL_TRUST');

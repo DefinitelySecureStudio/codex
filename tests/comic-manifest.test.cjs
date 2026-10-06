@@ -82,6 +82,8 @@ for (const c of approvalTimeCases) test(c.name, () => {
     a.decided_at = c.decided_at;
     a.expires_at = c.expires_at;
   }
+  s.release.approvers = s.approvals.filter(a => a.role !== 'production-reviewer')
+    .map(({ decision_id, role, actor, decided_at }) => ({ decision_id, role, actor, decided_at }));
   rebind(s);
   schemaValid(s);
   if (c.valid) verifyScenario(s, foundation);
