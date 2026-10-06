@@ -1,8 +1,10 @@
 # Comic Manifest v1
 
 Status: proposed 1.0.0 candidate, **unreleased; not a production dependency**.
-Owner: @andrewperis. [RFC 0007](../../rfcs/0007-comic-manifest-v1.md).
-[Studio #89](https://github.com/DefinitelySecureStudio/studio/issues/89).
+Owner: @andrewperis. [RFC 0007](../../rfcs/0007-comic-manifest-v1.md) and
+[RFC 0008](../../rfcs/0008-comic-manifest-rendition-profiles.md).
+[Studio #89](https://github.com/DefinitelySecureStudio/studio/issues/89) and
+[#94](https://github.com/DefinitelySecureStudio/studio/issues/94).
 Authority: [Studio ADR 0018](https://github.com/DefinitelySecureStudio/studio/blob/7b5065cef76bea9580609caba356b0d8fe7cc17c/adr/0018-comic-manifest-architecture.md)
 and [architecture](https://github.com/DefinitelySecureStudio/studio/blob/7b5065cef76bea9580609caba356b0d8fe7cc17c/comic-manifest/ARCHITECTURE.md).
 Constitution: v1.0.0, `constitution/v1.0.0`, Studio commit
@@ -121,19 +123,56 @@ regardless of whether it happens to contain an innocuous string.
 
 ## Renditions and build results
 
-A production declares at least one required rendition. IDs, required/optional
-status, supported media type, dimensions, alt text, transcript and rights notice
-are explicit. Images require dimensions; text/PDF use null dimensions in this v1
-baseline. The contract does not render or inspect media. Consumers must check
-actual media signatures/dimensions and humans must assess accessibility/meaning;
-a claimed media type or transcript is insufficient proof. Source editing formats,
-layout engines and illustration generation are outside v1.
+A production declares at least one required rendition. Every requirement names an
+immutable profile ID/version, one permitted media type, exact target dimensions or
+null, and a positive `max_bytes` no greater than the profile cap. A profile version
+has fixed semantics; a changed media set or limit requires a new version. Consumers
+MUST support the exact profile pair and MUST reject unknown pairs, aliases,
+wildcards, `latest` or silent fallback.
+
+The v1 profile catalog is:
+
+| Profile ID | Version | Permitted media type(s) | Dimensions | Maximum declared bytes |
+| --- | --- | --- | --- | ---: |
+| `comic-page-image` | `1.0.0` | `image/png`, `image/jpeg`, `image/webp` | Both positive integer dimensions required; each at most 8,192 pixels and product at most 33,554,432 pixels | 50,000,000 |
+| `comic-portable-document` | `1.0.0` | `application/pdf` | `null` | 50,000,000 |
+| `comic-accessible-transcript` | `1.0.0` | `text/plain` | `null` | 131,072 |
+
+The declared dimensions are the exact expected output dimensions, not a scaling
+instruction. Each result/public output repeats the profile pair, declared byte cap,
+dimensions, media type and accessibility/rights metadata. Those fields MUST equal
+the production requirement. Result and release artifacts MUST not exceed the
+requirement's `max_bytes`; a profile-level cap cannot be raised by a manifest.
+Complete results MUST contain each required rendition once, MAY omit optional
+renditions, and MUST NOT contain undeclared or duplicate rendition IDs.
+
+`alt_text` MUST be nonempty and MUST describe the relevant visual content concisely.
+`transcript` MUST be nonempty and preserve ordered dialogue/captions for the episode.
+`rights_notice` MUST be nonempty and state the intended notice for that output.
+These declarations are carried unchanged from production into result and release;
+they are review inputs, not proof that text is accurate, accessible, legally
+sufficient, or cleared. The public release MUST also contain the exact standard
+`production_credit` and its final title, Universe-assigned `DS-NNNN` episode ID,
+release revision/predecessor, canon scope, destination, audience, purpose and
+publication time. The public episode ID is distinct from the opaque production
+UUID; assignment consistency is checked explicitly and the number is never
+derived from a private identity.
+
+The contract does not render, decode, letter or inspect media. Matching declared
+type, dimensions, byte size, descriptions, credit or rights notice does not prove
+that bytes have that media type, render correctly, meet creative/accessibility
+quality, include the credit visibly, establish rights ownership/permission or are
+safe to publish. Consumers must verify actual artifact bytes and dimensions;
+qualified humans review accessibility, creative quality, rights, disclosure and
+publication. Source editing formats, layout engines and illustration generation
+are outside v1.
 
 A result references the exact complete production record and repeats its exact
 `inputs`. It carries distinct result/attempt IDs; attempts never mutate production.
-Outputs MUST have unique declared rendition IDs and match each requirement's media,
-dimensions, alt text, transcript and rights. Raw bytes MUST verify against recorded
-size/digest. A result may use HTTPS output locations or protected store UUID handles;
+Outputs MUST have unique declared rendition IDs and exactly match each requirement's
+profile/version, media, dimensions, byte cap, alt text, transcript and rights notice.
+Artifact byte size MUST be within the declared cap and raw bytes MUST verify against
+recorded size/digest. A result may use HTTPS output locations or protected store UUID handles;
 these are never automatically copied into public records. `complete` requires every
 required rendition, at least one output and no diagnostics. Optional absent outputs
 are allowed; unexpected outputs fail. `partial`/`failed` require a safe diagnostic
@@ -187,7 +226,9 @@ protected references are excluded. Public outputs contain the exact selected
 result's output list in result order, with identical content identities/requirements
 and approved public HTTPS locations. V1 publishes that result's entire selected
 output set; a different selection requires a separate result/candidate. Output
-identity is independently verifiable without access to private systems.
+identity is independently verifiable without access to private systems. Every
+published output preserves the exact profile ID/version and byte cap carried by
+the production requirement and build result.
 
 Public tool, workflow identity, times and reproducibility MUST agree with the
 selected result. Public transformations preserve ordered step IDs. They retain only input/output

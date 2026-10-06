@@ -11,6 +11,13 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Extended the unreleased Comic Manifest 1.0.0 candidate for Studio #94 with
+  immutable versioned output profiles, per-output limits, exact requirement/result/
+  release metadata matching and explicit rights/accessibility/publication boundaries.
+  RFC 0008 and synthetic passing/failing fixtures accompany the proposed change.
+  This supersedes only the prior unreleased candidate source; released SDK, Context
+  Package and Context Builder bytes remain unchanged.
+
 - Added Comic Manifest 1.0.0 (new additive, unreleased family) for Studio #89:
   RFC 0007, three closed record schemas, detached approval bindings, normative
   identity/privacy/compatibility semantics and offline synthetic conformance.

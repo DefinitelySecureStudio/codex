@@ -5,6 +5,13 @@ record kinds and detached approval definition travel together in one contract
 bundle. Their `spec_version` is independent of episode revisions, artifact logical
 versions and the Context Package/Builder/Prompt SDK contract versions.
 
+RFC 0008 completes the rendition/publication portion of this same pre-release
+candidate. It adds required profile and output-cap fields before Comic Manifest
+1.0.0 is accepted or published. The earlier #89 candidate source and the #90–#93
+development consumers are not a released 1.0.0 contract; consumers must update to
+the Codex revision accepted for the candidate before using the expanded schema.
+The new profile references themselves use exact immutable ID/version pairs.
+
 Consumers must advertise exact supported kind/version pairs; a 1.0.0 validator
 rejects 1.0.1/1.1.0 until explicitly supported. This is the RFC's intentional narrow
 capability rule, not a promise of implicit minor compatibility. Closed records

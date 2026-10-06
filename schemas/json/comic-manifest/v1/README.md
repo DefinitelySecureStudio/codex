@@ -7,5 +7,8 @@ Use its `$defs/approval` entry point for detached approval bindings.
 [Normative semantics](../../../../specs/manifests/comic-manifest-v1.md),
 [versioning](../../../../specs/manifests/COMIC-MANIFEST-VERSIONING.md) and
 [fixture guide](../../../../fixtures/comic-manifest-v1.md) are required companions.
+The exact versioned rendition profiles and their media, dimensions and byte/pixel
+limits are defined in the normative specification and enforced relationally by
+consumer conformance checks.
 Schema validation is only the structural layer; it proves neither cross-record
 integrity nor authority. Unreleased candidate; production consumption waits for #99.

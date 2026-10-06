@@ -7,6 +7,23 @@ const check = (v, code) => assert.ok(v, code);
 const unique = (xs, code) => eq(new Set(xs).size, xs.length, code);
 const rank = c => ['public', 'internal', 'confidential', 'restricted'].indexOf(c);
 const gates = ['editorial', 'canon-continuity', 'visual-text', 'integrity', 'provenance', 'security-privacy', 'rights', 'accessibility', 'packaging'];
+const renditionProfiles = {
+  'comic-page-image@1.0.0': { media: ['image/png', 'image/jpeg', 'image/webp'], maxBytes: 50_000_000, image: true },
+  'comic-portable-document@1.0.0': { media: ['application/pdf'], maxBytes: 50_000_000, image: false },
+  'comic-accessible-transcript@1.0.0': { media: ['text/plain'], maxBytes: 131_072, image: false }
+};
+function verifyRenditionProfile(r) {
+  const profile = renditionProfiles[`${r.profile.profile_id}@${r.profile.profile_version}`];
+  check(profile, 'RENDITION_PROFILE');
+  const mediaType = r.artifact ? r.artifact.media_type : r.media_type;
+  check(profile.media.includes(mediaType), 'RENDITION_MEDIA');
+  if (profile.image) {
+    check(r.dimensions !== null && r.dimensions.width <= 8_192 && r.dimensions.height <= 8_192 &&
+      r.dimensions.width * r.dimensions.height <= 33_554_432, 'RENDITION_DIMENSIONS');
+  } else eq(r.dimensions, null, 'RENDITION_DIMENSIONS');
+  check(r.max_bytes <= profile.maxBytes, 'RENDITION_LIMIT');
+  if (r.artifact) check(r.artifact.byte_size <= r.max_bytes, 'OUTPUT_LIMIT');
+}
 const productionRef = p => ({ production_id: p.production_id, revision: p.revision, identity: identity(p) });
 function verifyProduction(p) {
   eq(p.previous === null, p.revision === 1, 'REVISION');
@@ -30,7 +47,10 @@ function verifyProduction(p) {
     check(rank(p.classification) >= rank(b.context.classification), 'CLASSIFICATION');
     unique(b.context.sections, 'CONTEXT_SECTIONS');
   }
-  for (const r of p.renditions) eq(r.media_type.startsWith('image/'), r.dimensions !== null, 'DIMENSIONS');
+  for (const r of p.renditions) {
+    verifyRenditionProfile(r);
+    eq(r.media_type.startsWith('image/'), r.dimensions !== null, 'DIMENSIONS');
+  }
   check(p.renditions.some(r => r.required), 'REQUIRED_OUTPUT');
 }
 function verifyResult(p, r, bytes) {
@@ -44,6 +64,8 @@ function verifyResult(p, r, bytes) {
   for(const g of r.execution.generation) unique(g.parameters.map(p=>p.name),'PARAMETER_ID');
   for (const out of r.outputs) {
     const req = p.renditions.find(x => x.rendition_id === out.rendition_id); check(req, 'UNEXPECTED_OUTPUT');
+    eq(out.profile, req.profile, 'OUTPUT_REQUIREMENT'); eq(out.max_bytes, req.max_bytes, 'OUTPUT_REQUIREMENT');
+    verifyRenditionProfile(out);
     eq(out.artifact.media_type, req.media_type, 'MEDIA'); eq(out.dimensions, req.dimensions, 'DIMENSIONS');
     for (const key of ['alt_text', 'transcript', 'rights_notice']) eq(out[key], req[key], 'OUTPUT_REQUIREMENT');
     const raw = bytes[out.rendition_id]; check(typeof raw === 'string', 'MISSING_BYTES');
@@ -102,6 +124,7 @@ function verifyScenario(s, foundation) {
   eq(rel.outputs.map(x => x.rendition_id), r.outputs.map(x => x.rendition_id), 'RELEASE_OUTPUTS');
   for (let i=0; i<rel.outputs.length; i++) {
     const {artifact: pa, ...pm} = rel.outputs[i], {artifact: ra, ...rm} = r.outputs[i]; eq(pm, rm, 'RELEASE_OUTPUTS');
+    verifyRenditionProfile(rel.outputs[i]);
     eq({ ...pa, artifact_uri: ra.artifact_uri }, ra, 'RELEASE_OUTPUTS');
   }
   eq(rel.execution.tool, r.execution.tool, 'TOOL_LINK');

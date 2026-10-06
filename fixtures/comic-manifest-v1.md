@@ -17,11 +17,16 @@ real edits preserve or renew approvals. `rebind: false` retains historical evide
 to test invalidation. See the [test-only oracle](../tests/support/comic-manifest-oracle.cjs).
 
 The suite includes protected-context and authored public-only success, append-only
-correction, partial/failed evidence, deterministic identity, unknown versions/fields,
-ordered identities, outputs, immutable references, package bindings, stale/revoked/
-forged approvals, public gates and private-context projection. Output text bytes and
-public dependency bytes are explicit fixture inputs and independently hashed.
-Tests never create an approval from a production runtime or execute a provider.
+correction, partial/failed evidence, deterministic identity, exact versioned output
+profiles, inclusive pixel/byte boundaries, profile/media incompatibility, missing,
+duplicate and undeclared outputs, accessibility/rights metadata mismatch, unknown
+versions/fields, ordered identities, immutable references, package bindings,
+stale/revoked/forged approvals, public gates and private-context projection. Tests
+compose non-rendered image/PDF placeholder bytes to exercise declared profile
+relationships; they deliberately do not claim media signatures or rendering.
+Output text bytes and public dependency bytes are explicit fixture inputs and
+independently hashed. Tests never create an approval from a production runtime or
+execute a provider.
 
 Run `npm ci --ignore-scripts`, then `npm run test:comic`. Run `npm test` from a clean
 committed tree to include existing release-bundle reproducibility tests (the release
@@ -30,7 +35,9 @@ the lockfile. Neither command needs network after dependency installation.
 
 Coverage limits are explicit: the oracle exercises fixture relationships, not a
 hardened parser, production trust verifier, media decoder, issuer, secure store or
-public projection implementation. Current package use is tested by the companion
+public projection implementation. A rights notice is metadata, not evidence of
+ownership or permission; text presence does not prove accessibility quality or
+disclosure safety. Current package use is tested by the companion
 Platform proof using the released SDK. Unicode/duplicate-key/size/depth raw parsing,
 real revocation adapters, denied-read guarantees, free-text disclosure and artifact
 rights need their later runtime and qualified human checks. Passing fixtures alone
