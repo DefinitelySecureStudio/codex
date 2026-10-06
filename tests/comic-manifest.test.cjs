@@ -9,6 +9,7 @@ const read = path => JSON.parse(readFileSync(resolve(__dirname, '..', path)));
 const schema = read('schemas/json/comic-manifest/v1/comic-manifest.schema.json');
 const ajv = new Ajv({ strict: true, strictRequired: false, strictTypes: false, allErrors: true }); addFormats(ajv);
 const validate = ajv.compile(schema), approval = ajv.compile({ $ref: schema.$id + '#/$defs/approval' });
+const timestamp = ajv.compile(schema.$defs.time);
 const base = read('fixtures/comic-manifest-v1.json'), foundation = read('fixtures/context-builder-v1.json');
 const approvalTimeCases = read('fixtures/comic-manifest-v1-approval-times.json');
 function schemaValid(s) {
@@ -77,6 +78,7 @@ test('all detached approval fields are closed and exactly versioned', () => {
 for (const c of approvalTimeCases) test(c.name, () => {
   const s = structuredClone(base);
   s.at = c.action_time;
+  if (c.schema_valid_action_time !== undefined) assert.equal(timestamp(s.at), c.schema_valid_action_time);
   s.release.scope.publication_time = c.publication_time;
   for (const a of s.approvals) {
     a.decided_at = c.decided_at;

@@ -22,6 +22,9 @@ Equality with `decided_at` is valid; equality with `expires_at` at either the
 action or scoped publication time is expired. Before comparison, a verifier must
 validate trusted `action_time` against the candidate schema's `$defs/time`
 constraints, including calendar and clock ranges; invalid values must fail closed.
+Approval-time comparisons support seconds `00` through `59`; a timestamp with
+second `60` must fail closed for this check, even if its shape passes JSON Schema
+date-time format validation. This deliberately does not infer leap-second dates.
 Valid `T`, `t`, or single-whitespace separators and fractional seconds remain
 accepted as defined by that schema. This records the existing test-oracle
 relationship as an explicit contract rule.

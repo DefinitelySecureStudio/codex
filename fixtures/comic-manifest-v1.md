@@ -28,7 +28,9 @@ and publication time, future decisions, submillisecond boundaries, equal
 instants with different fractional widths, and equivalent instants using the
 uppercase `T`, lowercase `t`, or a single whitespace separator accepted by the
 schema. Trusted action-time cases cover invalid hours, minutes, seconds and
-calendar dates, plus a valid leap day.
+calendar dates, valid leap-day and maximum-precision ordinary-second controls,
+and fail-closed behavior for schema-valid second-60 timestamps in action,
+decision, expiry and publication fields.
 The tests compose non-rendered image/PDF placeholder bytes to exercise declared profile
 relationships; they deliberately do not claim media signatures or rendering.
 Output text bytes and public dependency bytes are explicit fixture inputs and

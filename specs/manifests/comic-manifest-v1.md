@@ -270,9 +270,12 @@ revocation and current time, and fail closed on missing evidence. Let `action_ti
 be the trusted time at which the authorization-dependent action is evaluated. The
 verifier MUST validate `action_time` against the candidate schema's `$defs/time`
 constraints, including calendar and clock ranges, before comparison. Invalid
-calendar dates and out-of-range clock fields MUST fail closed. Valid `T`, `t`, or
+calendar dates and out-of-range clock fields MUST fail closed. Approval-time
+comparisons support seconds `00` through `59`; a timestamp with second `60` MUST
+fail closed for this check, even if its shape passes JSON Schema date-time format
+validation. This deliberately does not infer leap-second dates. Valid `T`, `t`, or
 single-whitespace separators and fractional seconds remain accepted as defined by
-that schema. The time check MUST satisfy `decided_at <= action_time < expires_at`; it MUST also
+the schema. The time check MUST satisfy `decided_at <= action_time < expires_at`; it MUST also
 satisfy `scope.publication_time < expires_at` for the publication time named in the
 exact scope. Expiry is exclusive: an action or scoped publication at exactly
 `expires_at` is expired, while an action at exactly `decided_at` is valid. A
