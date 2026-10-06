@@ -97,6 +97,7 @@ function verifyApproval(a, subject, artifacts, scope, s) {
   eq(a.artifact_digests, artifacts.map(x => x.artifact.sha256).sort(), 'APPROVAL_ARTIFACTS');
   eq(a.scope, scope, 'APPROVAL_SCOPE');
   const at = Date.parse(s.at);
+  // Decision time is inclusive; expiry is exclusive at both action and scoped publication time.
   check(Date.parse(a.decided_at) <= at && at < Date.parse(a.expires_at) && Date.parse(scope.publication_time) < Date.parse(a.expires_at), 'APPROVAL_TIME');
   // A test harness supplies trusted decisions OUTSIDE untrusted record bytes.
   const trusted = s.trust.approvals.find(x => x.decision_id === a.decision_id);

@@ -10,6 +10,7 @@ const schema = read('schemas/json/comic-manifest/v1/comic-manifest.schema.json')
 const ajv = new Ajv({ strict: true, strictRequired: false, strictTypes: false, allErrors: true }); addFormats(ajv);
 const validate = ajv.compile(schema), approval = ajv.compile({ $ref: schema.$id + '#/$defs/approval' });
 const base = read('fixtures/comic-manifest-v1.json'), foundation = read('fixtures/context-builder-v1.json');
+const approvalTimeCases = read('fixtures/comic-manifest-v1-approval-times.json');
 function schemaValid(s) {
   for (const k of ['production','result','release']) assert.equal(validate(s[k]), true, `${k}: ${JSON.stringify(validate.errors)}`);
   for (const a of s.approvals) assert.equal(approval(a), true, JSON.stringify(approval.errors));
@@ -72,6 +73,19 @@ for (const kind of ['production','result','release']) for (const [field,value] o
 test('all detached approval fields are closed and exactly versioned', () => {
   assert.equal(approval({...base.approvals[0],allow:true}),false);
   assert.equal(approval({...base.approvals[0],spec_version:'2.0.0'}),false);
+});
+for (const c of approvalTimeCases) test(c.name, () => {
+  const s = structuredClone(base);
+  s.at = c.action_time;
+  s.release.scope.publication_time = c.publication_time;
+  for (const a of s.approvals) {
+    a.decided_at = c.decided_at;
+    a.expires_at = c.expires_at;
+  }
+  rebind(s);
+  schemaValid(s);
+  if (c.valid) verifyScenario(s, foundation);
+  else assert.throws(() => verifyScenario(s, foundation), /APPROVAL_TIME/);
 });
 for (const c of read('fixtures/comic-manifest-v1-cases.json')) test(c.name, () => {
   const s = structuredClone(base);

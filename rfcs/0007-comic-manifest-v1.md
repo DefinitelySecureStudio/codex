@@ -15,6 +15,13 @@ approval bindings avoid circular hashes and preserve exact scope without grantin
 authority from schema validity. Public private-context lineage uses approved random
 attestations and protected mappings, not protected record IDs or hashes.
 
+Trusted approval-time evaluation uses an inclusive decision-time bound and an
+exclusive expiry bound: `decided_at <= action_time < expires_at`. The publication
+time named in the exact scope must also be strictly earlier than `expires_at`.
+Equality with `decided_at` is valid; equality with `expires_at` at either the
+action or scoped publication time is expired. This records the existing
+test-oracle relationship as an explicit contract rule.
+
 Codex owns normative meaning. Platform validates and supplies a test-only consumer
 proof against the existing released SDK/Builder output. Universe owns public
 publication and canon; private source owners retain access/disclosure authority.

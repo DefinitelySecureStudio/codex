@@ -11,6 +11,11 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Clarified the unreleased Comic Manifest 1.0.0 candidate's (#95 prerequisite)
+  detached approval time bounds: decision time is inclusive, expiry is exclusive
+  at both action and scoped publication time. Added synthetic boundary fixtures
+  and focused conformance coverage; no released contract bytes change.
+
 - Extended the unreleased Comic Manifest 1.0.0 candidate for Studio #94 with
   immutable versioned output profiles, per-output limits, exact requirement/result/
   release metadata matching and explicit rights/accessibility/publication boundaries.

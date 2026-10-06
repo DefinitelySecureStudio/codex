@@ -21,7 +21,10 @@ correction, partial/failed evidence, deterministic identity, exact versioned out
 profiles, inclusive pixel/byte boundaries, profile/media incompatibility, missing,
 duplicate and undeclared outputs, accessibility/rights metadata mismatch, unknown
 versions/fields, ordered identities, immutable references, package bindings,
-stale/revoked/forged approvals, public gates and private-context projection. Tests
+stale/revoked/forged approvals, approval-time boundaries, public gates and
+private-context projection. The [approval-time fixture matrix](comic-manifest-v1-approval-times.json)
+covers inclusive decision equality, valid action/publication just before expiry,
+expiry equality at either time, and a future decision. Tests
 compose non-rendered image/PDF placeholder bytes to exercise declared profile
 relationships; they deliberately do not claim media signatures or rendering.
 Output text bytes and public dependency bytes are explicit fixture inputs and
