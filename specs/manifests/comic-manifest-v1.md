@@ -266,8 +266,23 @@ raw artifact digests (empty for production review), exact release `scope`, revie
 role/actor, decision UUID, UTC decision/expiry and external authority reference.
 A binding is necessary evidence, not an authenticated grant. Trusted verification
 MUST bind the actual reviewer to the role, subject, scope and decision, check
-revocation and current time, and fail closed on missing evidence. It MUST be valid
-at the actual action and authorized publication time. Never trust an allow boolean.
+revocation and current time, and fail closed on missing evidence. Let `action_time`
+be the trusted time at which the authorization-dependent action is evaluated. The
+verifier MUST validate `action_time` against the candidate schema's `$defs/time`
+constraints, including calendar and clock ranges, before comparison. Invalid
+calendar dates and out-of-range clock fields MUST fail closed. Approval-time
+comparisons support seconds `00` through `59`; a timestamp with second `60` MUST
+fail closed for this check, even if its shape passes JSON Schema date-time format
+validation. This deliberately does not infer leap-second dates. Valid `T`, `t`, or
+single-whitespace separators and fractional seconds remain accepted as defined by
+the schema. The time check MUST satisfy `decided_at <= action_time < expires_at`; it MUST also
+satisfy `scope.publication_time < expires_at` for the publication time named in the
+exact scope. Expiry is exclusive: an action or scoped publication at exactly
+`expires_at` is expired, while an action at exactly `decided_at` is valid. A
+decision later than `action_time` is not yet valid. The publication-time check
+continues to use the existing scope relationship; this clarification adds no
+separate ordering rule between `decided_at` and `scope.publication_time`. Never
+trust an allow boolean.
 
 The production-reviewer approves the exact production intent for its declared
 scope. Publisher and canon-editor decisions bind the exact public release payload

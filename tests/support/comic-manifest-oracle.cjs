@@ -7,6 +7,30 @@ const check = (v, code) => assert.ok(v, code);
 const unique = (xs, code) => eq(new Set(xs).size, xs.length, code);
 const rank = c => ['public', 'internal', 'confidential', 'restricted'].indexOf(c);
 const gates = ['editorial', 'canon-continuity', 'visual-text', 'integrity', 'provenance', 'security-privacy', 'rights', 'accessibility', 'packaging'];
+function parseUtcInstant(value) {
+  if (typeof value !== 'string' || value.length > 32) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})[Tt\s](\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/.exec(value);
+  if (!match) return null;
+  const [, yearText, monthText, dayText, hourText, minuteText, secondText, fraction] = match;
+  const year = Number(yearText), month = Number(monthText), day = Number(dayText);
+  const hour = Number(hourText), minute = Number(minuteText), second = Number(secondText);
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const days = [0, 31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (month < 1 || month > 12 || day < 1 || day > days[month]) return null;
+  if (hour > 23 || minute > 59 || second > 59) return null;
+  return {
+    wholeSecond: `${yearText}-${monthText}-${dayText}T${hourText}:${minuteText}:${secondText}`,
+    fraction: fraction ?? ''
+  };
+}
+function compareUtcInstants(left, right) {
+  const a = parseUtcInstant(left), b = parseUtcInstant(right);
+  check(a && b, 'APPROVAL_TIME');
+  if (a.wholeSecond !== b.wholeSecond) return a.wholeSecond < b.wholeSecond ? -1 : 1;
+  const width = Math.max(a.fraction.length, b.fraction.length);
+  const af = a.fraction.padEnd(width, '0'), bf = b.fraction.padEnd(width, '0');
+  return af < bf ? -1 : af > bf ? 1 : 0;
+}
 const renditionProfiles = {
   'comic-page-image@1.0.0': { media: ['image/png', 'image/jpeg', 'image/webp'], maxBytes: 50_000_000, image: true },
   'comic-portable-document@1.0.0': { media: ['application/pdf'], maxBytes: 50_000_000, image: false },
@@ -96,8 +120,9 @@ function verifyApproval(a, subject, artifacts, scope, s) {
   eq(a.subject, identity(subject), 'APPROVAL_SUBJECT');
   eq(a.artifact_digests, artifacts.map(x => x.artifact.sha256).sort(), 'APPROVAL_ARTIFACTS');
   eq(a.scope, scope, 'APPROVAL_SCOPE');
-  const at = Date.parse(s.at);
-  check(Date.parse(a.decided_at) <= at && at < Date.parse(a.expires_at) && Date.parse(scope.publication_time) < Date.parse(a.expires_at), 'APPROVAL_TIME');
+  // Validate trusted action time before comparing arbitrary schema-valid fractions.
+  check(compareUtcInstants(a.decided_at, s.at) <= 0 && compareUtcInstants(s.at, a.expires_at) < 0 &&
+    compareUtcInstants(scope.publication_time, a.expires_at) < 0, 'APPROVAL_TIME');
   // A test harness supplies trusted decisions OUTSIDE untrusted record bytes.
   const trusted = s.trust.approvals.find(x => x.decision_id === a.decision_id);
   check(trusted && trusted.sha256 === identity(a).sha256 && !s.trust.revoked.includes(a.decision_id), 'APPROVAL_TRUST');
