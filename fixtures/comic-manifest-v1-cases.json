@@ -541,6 +541,50 @@
     "rebind": true
   },
   {
+    "name": "allowed profile alternative still must equal selected media type",
+    "layer": "relational",
+    "edits": [
+      {
+        "path": ["production", "renditions", 0, "profile", "profile_id"],
+        "value": "comic-page-image"
+      },
+      {
+        "path": ["production", "renditions", 0, "media_type"],
+        "value": "image/png"
+      },
+      {
+        "path": ["production", "renditions", 0, "dimensions"],
+        "value": {"width": 1, "height": 1}
+      },
+      {
+        "path": ["result", "outputs", 0, "profile", "profile_id"],
+        "value": "comic-page-image"
+      },
+      {
+        "path": ["result", "outputs", 0, "artifact", "media_type"],
+        "value": "image/webp"
+      },
+      {
+        "path": ["result", "outputs", 0, "dimensions"],
+        "value": {"width": 1, "height": 1}
+      },
+      {
+        "path": ["release", "outputs", 0, "profile", "profile_id"],
+        "value": "comic-page-image"
+      },
+      {
+        "path": ["release", "outputs", 0, "artifact", "media_type"],
+        "value": "image/webp"
+      },
+      {
+        "path": ["release", "outputs", 0, "dimensions"],
+        "value": {"width": 1, "height": 1}
+      }
+    ],
+    "code": "MEDIA",
+    "rebind": true
+  },
+  {
     "name": "wrong output digest",
     "layer": "relational",
     "edits": [

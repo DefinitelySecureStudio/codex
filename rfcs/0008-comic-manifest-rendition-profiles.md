@@ -57,9 +57,11 @@ version and explicit consumer support.
 
 Every build-result and public-release output MUST repeat the exact profile pair,
 declared `max_bytes`, dimensions and accessibility/rights metadata from its
-production requirement. Its media type MUST be permitted by the profile; its
-dimensions and metadata MUST match the requirement exactly; and the recorded
-artifact byte size MUST NOT exceed `max_bytes`. A complete result MUST include
+production requirement. Its media type MUST equal the exact media type selected
+by the production requirement, even when the profile permits other types; that
+selected type MUST also be permitted by the profile. Its dimensions and metadata
+MUST match the requirement exactly, and its recorded artifact byte size MUST NOT
+exceed `max_bytes`. A complete result MUST include
 every required rendition exactly once, MAY omit optional renditions, and MUST NOT
 include missing, duplicate or undeclared output IDs. The public release MUST
 preserve the selected result's output order and exact public output metadata.
