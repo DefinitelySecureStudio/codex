@@ -7,14 +7,29 @@ const check = (v, code) => assert.ok(v, code);
 const unique = (xs, code) => eq(new Set(xs).size, xs.length, code);
 const rank = c => ['public', 'internal', 'confidential', 'restricted'].indexOf(c);
 const gates = ['editorial', 'canon-continuity', 'visual-text', 'integrity', 'provenance', 'security-privacy', 'rights', 'accessibility', 'packaging'];
+function parseUtcInstant(value) {
+  if (typeof value !== 'string' || value.length > 32) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})[Tt\s](\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?Z$/.exec(value);
+  if (!match) return null;
+  const [, yearText, monthText, dayText, hourText, minuteText, secondText, fraction] = match;
+  const year = Number(yearText), month = Number(monthText), day = Number(dayText);
+  const hour = Number(hourText), minute = Number(minuteText);
+  const second = Number(`${secondText}${fraction ? `.${fraction}` : ''}`);
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const days = [0, 31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (month < 1 || month > 12 || day < 1 || day > days[month]) return null;
+  if (hour > 23 || minute > 59 || !(second < 60 || (hour === 23 && minute === 59 && second < 61))) return null;
+  return {
+    wholeSecond: `${yearText}-${monthText}-${dayText}T${hourText}:${minuteText}:${secondText}`,
+    fraction: fraction ?? ''
+  };
+}
 function compareUtcInstants(left, right) {
-  const parse = value => /^(\d{4}-\d{2}-\d{2})[Tt\s](\d{2}:\d{2}:\d{2})(?:\.(\d+))?Z$/.exec(value);
-  const a = parse(left), b = parse(right);
+  const a = parseUtcInstant(left), b = parseUtcInstant(right);
   check(a && b, 'APPROVAL_TIME');
-  const aWholeSecond = `${a[1]}T${a[2]}`, bWholeSecond = `${b[1]}T${b[2]}`;
-  if (aWholeSecond !== bWholeSecond) return aWholeSecond < bWholeSecond ? -1 : 1;
-  const width = Math.max(a[3]?.length ?? 0, b[3]?.length ?? 0);
-  const af = (a[3] ?? '').padEnd(width, '0'), bf = (b[3] ?? '').padEnd(width, '0');
+  if (a.wholeSecond !== b.wholeSecond) return a.wholeSecond < b.wholeSecond ? -1 : 1;
+  const width = Math.max(a.fraction.length, b.fraction.length);
+  const af = a.fraction.padEnd(width, '0'), bf = b.fraction.padEnd(width, '0');
   return af < bf ? -1 : af > bf ? 1 : 0;
 }
 const renditionProfiles = {
@@ -106,7 +121,7 @@ function verifyApproval(a, subject, artifacts, scope, s) {
   eq(a.subject, identity(subject), 'APPROVAL_SUBJECT');
   eq(a.artifact_digests, artifacts.map(x => x.artifact.sha256).sort(), 'APPROVAL_ARTIFACTS');
   eq(a.scope, scope, 'APPROVAL_SCOPE');
-  // Preserve arbitrary schema-valid fractional precision at each approval boundary.
+  // Validate trusted action time before comparing arbitrary schema-valid fractions.
   check(compareUtcInstants(a.decided_at, s.at) <= 0 && compareUtcInstants(s.at, a.expires_at) < 0 &&
     compareUtcInstants(scope.publication_time, a.expires_at) < 0, 'APPROVAL_TIME');
   // A test harness supplies trusted decisions OUTSIDE untrusted record bytes.

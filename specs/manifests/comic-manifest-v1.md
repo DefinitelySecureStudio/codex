@@ -268,7 +268,11 @@ A binding is necessary evidence, not an authenticated grant. Trusted verificatio
 MUST bind the actual reviewer to the role, subject, scope and decision, check
 revocation and current time, and fail closed on missing evidence. Let `action_time`
 be the trusted time at which the authorization-dependent action is evaluated. The
-time check MUST satisfy `decided_at <= action_time < expires_at`; it MUST also
+verifier MUST validate `action_time` against the candidate schema's `$defs/time`
+constraints, including calendar and clock ranges, before comparison. Invalid
+calendar dates and out-of-range clock fields MUST fail closed. Valid `T`, `t`, or
+single-whitespace separators and fractional seconds remain accepted as defined by
+that schema. The time check MUST satisfy `decided_at <= action_time < expires_at`; it MUST also
 satisfy `scope.publication_time < expires_at` for the publication time named in the
 exact scope. Expiry is exclusive: an action or scoped publication at exactly
 `expires_at` is expired, while an action at exactly `decided_at` is valid. A

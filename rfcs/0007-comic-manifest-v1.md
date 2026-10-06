@@ -19,8 +19,12 @@ Trusted approval-time evaluation uses an inclusive decision-time bound and an
 exclusive expiry bound: `decided_at <= action_time < expires_at`. The publication
 time named in the exact scope must also be strictly earlier than `expires_at`.
 Equality with `decided_at` is valid; equality with `expires_at` at either the
-action or scoped publication time is expired. This records the existing
-test-oracle relationship as an explicit contract rule.
+action or scoped publication time is expired. Before comparison, a verifier must
+validate trusted `action_time` against the candidate schema's `$defs/time`
+constraints, including calendar and clock ranges; invalid values must fail closed.
+Valid `T`, `t`, or single-whitespace separators and fractional seconds remain
+accepted as defined by that schema. This records the existing test-oracle
+relationship as an explicit contract rule.
 
 Codex owns normative meaning. Platform validates and supplies a test-only consumer
 proof against the existing released SDK/Builder output. Universe owns public

@@ -26,7 +26,9 @@ private-context projection. The [approval-time fixture matrix](comic-manifest-v1
 covers inclusive decision equality, just-before and equal expiry at both action
 and publication time, future decisions, submillisecond boundaries, equal
 instants with different fractional widths, and equivalent instants using the
-uppercase `T`, lowercase `t`, or a single whitespace separator accepted by the schema.
+uppercase `T`, lowercase `t`, or a single whitespace separator accepted by the
+schema. Trusted action-time cases cover invalid hours, minutes, seconds and
+calendar dates, plus a valid leap day.
 The tests compose non-rendered image/PDF placeholder bytes to exercise declared profile
 relationships; they deliberately do not claim media signatures or rendering.
 Output text bytes and public dependency bytes are explicit fixture inputs and
