@@ -200,12 +200,13 @@ It does not approve this Codex release-preparation diff, the Codex release
 assets, a consumer adoption, or final publication. No human review of those
 release artifacts is claimed here.
 
-The current public Studio exception register says there are no active Article
-12 exceptions. This assessment therefore identifies no AI-review exception
-and relies on none. AI-assisted review and automated checks are advisory or
-bounded predicate evidence; Constitution Section 9.4 reserved judgments and
-final A4 decisions still require the authorized qualified human. The release
-gate remains open for exact-head owner/CODEOWNER review, a fresh locked-dependency
-audit, final license/NOTICE review, post-merge reproducible builds, and explicit
-owner publication approval. No tag, release, asset, npm publication, visibility
-change, production trust, or Epic #6 closeout is authorized or represented.
+The owner-provided Epic #6 A3 AI-review exception applies to code-merge review
+only. It authorizes AI review within that merge scope; it does not authorize an
+A4 release decision, tag, release asset, or publication. No release/publication
+exception is provided. No human review of the final release artifacts is
+claimed here, and a separate explicit owner release approval remains required.
+The release gate remains open for exact-head review/merge, a fresh
+locked-dependency audit, final license/NOTICE review, post-merge reproducible
+builds, and owner approval of exact artifact tuples. No tag, release, asset,
+npm publication, visibility change, production trust, or Epic #6 closeout is
+authorized or represented.

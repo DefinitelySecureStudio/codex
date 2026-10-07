@@ -23,15 +23,18 @@ unchanged.
   `2026-10-07T19:15:38Z`). It was not a GitHub review and is not release approval.
   No approved golden, oracle, source, or scenario bytes are modified here.
 - Constitution v1.0.0 is pinned to `constitution/v1.0.0`, Studio commit
-  `a9cc8a503aa30e17820edc62ac95f7cbe10e0564`. The public exception register
-  lists no active Article 12 exception; this candidate does not rely on one.
-  AI-assisted review and automation are advisory or establish only recorded,
-  bounded predicates. They do not satisfy Article 9.4 reserved human judgments
-  or final A4 release decisions. No human review of these new release artifacts
-  is claimed by this preparation record.
+  `a9cc8a503aa30e17820edc62ac95f7cbe10e0564`. The owner's task-specific Epic
+  #6 A3 AI-review exception applies to code-merge review only. It does not
+  authorize an A4 release decision, tag, release asset, or publication; no
+  release/publication exception is provided. No human review of final release
+  artifacts is claimed here, and separate explicit owner release approval
+  remains required.
 - Existing dependency versions and lock bytes are unchanged. Review the exact
   lockfile audit report and the Apache-2.0 LICENSE, NOTICE, and any
   THIRD_PARTY_NOTICES included in the bundle before approving release.
+- A fresh `npm audit --json` against this Codex preparation branch's lockfile
+  reports zero advisories; rerun it against the exact merged head before
+  publication.
 
 ## Build and verify locally
 
