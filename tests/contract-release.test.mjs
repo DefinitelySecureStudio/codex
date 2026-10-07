@@ -106,13 +106,20 @@ test('Comic Manifest has a separate deterministic one-contract catalog', async t
 test('release builder accepts an explicit source commit only for an exact matching tree', async t => {
   const root = await mkdtemp(join(tmpdir(), 'codex-release-source-identity-'));
   t.after(() => rm(root, { recursive: true, force: true }));
-  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd: new URL('../', import.meta.url) }).toString().trim();
-  const verifiedCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: new URL('../', import.meta.url) }).toString().trim();
-  const wrongCommit = execFileSync('git', ['rev-parse', 'HEAD^'], { cwd: new URL('../', import.meta.url) }).toString().trim();
+  const checkout = new URL('../', import.meta.url);
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd: checkout }).toString().trim();
+  const verifiedCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: checkout }).toString().trim();
+  const wrongTree = execFileSync('git', ['mktree'], { cwd: checkout, input: '' }).toString().trim();
+  const wrongCommit = execFileSync('git', ['commit-tree', wrongTree, '-m', 'release identity regression fixture'], {
+    cwd: checkout, encoding: 'utf8',
+    env: { ...process.env, GIT_AUTHOR_NAME: 'Release Fixture', GIT_AUTHOR_EMAIL: 'fixture@example.invalid',
+      GIT_COMMITTER_NAME: 'Release Fixture', GIT_COMMITTER_EMAIL: 'fixture@example.invalid' }
+  }).trim();
   const [manifest] = await buildContractRelease(join(root, 'matching'), 'comic-manifest-v1', { commit: verifiedCommit, tree });
   assert.equal(manifest.commit, verifiedCommit);
   await assert.rejects(buildContractRelease(join(root, 'wrong-tree'), 'comic-manifest-v1', { commit: verifiedCommit, tree: 'b'.repeat(40) }), /exact matching local Git tree/);
-  await assert.rejects(buildContractRelease(join(root, 'missing-commit'), 'comic-manifest-v1', { commit: 'a'.repeat(40), tree }), /not present as a verified local Git commit object/);
+  await assert.rejects(buildContractRelease(join(root, 'non-commit-object'), 'comic-manifest-v1', { commit: tree, tree }), /not present as a verified local Git commit object/);
+  await assert.rejects(buildContractRelease(join(root, 'missing-commit'), 'comic-manifest-v1', { commit: '0'.repeat(40), tree }), /not present as a verified local Git commit object/);
   await assert.rejects(buildContractRelease(join(root, 'wrong-commit'), 'comic-manifest-v1', { commit: wrongCommit, tree }), /exact matching local Git tree/);
 });
 
