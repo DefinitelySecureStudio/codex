@@ -63,3 +63,41 @@ test('Builder catalog publishes only the additive family with unchanged schema b
     assert.ok(bundle.files.some(file => file.path === path));
   }
 });
+
+test('Comic Manifest has a separate deterministic one-contract catalog', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'comic-manifest-release-test-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const first = join(root, 'first'), second = join(root, 'second');
+  const [manifest] = await buildContractRelease(first, 'comic-manifest-v1');
+  await buildContractRelease(second, 'comic-manifest-v1');
+
+  assert.equal(manifest.contract, 'comic-manifest');
+  assert.equal(manifest.version, '1.0.0');
+  assert.equal(manifest.tag, 'contract/comic-manifest/v1.0.0');
+  assert.equal(manifest.schema_id, 'urn:definitely-secure:contract:comic-manifest:1.0.0:comic-manifest');
+  assert.equal(manifest.constitution_commit, 'a9cc8a503aa30e17820edc62ac95f7cbe10e0564');
+  assert.equal(manifest.assets.length, 2);
+  assert.deepEqual(manifest.assets.map(asset => asset.filename), [
+    'comic-manifest-v1.0.0.schema.json', 'comic-manifest-v1.0.0.bundle.json'
+  ]);
+  assert.equal((await readdir(first)).length, 3);
+  for (const file of await readdir(first)) assert.deepEqual(await readFile(join(first, file)), await readFile(join(second, file)));
+
+  const schema = JSON.parse(await readFile(join(first, 'comic-manifest-v1.0.0.schema.json')));
+  assert.equal(schema.$id, manifest.schema_id);
+  for (const asset of manifest.assets) {
+    const bytes = await readFile(join(first, asset.filename));
+    assert.equal(bytes.length, asset.byte_size);
+    assert.equal(hash(bytes), asset.sha256);
+    assert.equal(asset.artifact_uri, `https://github.com/DefinitelySecureStudio/codex/releases/download/${encodeURIComponent(manifest.tag)}/${asset.filename}`);
+  }
+  const bundle = JSON.parse(await readFile(join(first, 'comic-manifest-v1.0.0.bundle.json')));
+  assert.equal(bundle.contract, 'comic-manifest');
+  assert.equal(bundle.version, '1.0.0');
+  assert.ok(bundle.files.some(file => file.path === 'LICENSE'));
+  assert.ok(bundle.files.some(file => file.path === 'NOTICE'));
+  assert.ok(bundle.files.some(file => file.path === 'releases/comic-manifest-v1.json'));
+  assert.ok(bundle.files.some(file => file.path === 'releases/comic-manifest-v1.md'));
+  assert.ok(!manifest.tag.includes('prompt-definition'));
+  assert.ok(!manifest.tag.includes('context-builder'));
+});

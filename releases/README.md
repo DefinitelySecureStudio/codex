@@ -4,6 +4,12 @@ For the additive Context Builder family use the independent
 [#86 checklist](context-builder-v1.md) and explicit `context-builder-v1` catalog.
 The historical five-contract catalog below must not be republished at its existing tags.
 
+For the additive Comic Manifest family use the independent
+[#99 checklist](comic-manifest-v1.md) and explicit `comic-manifest-v1` catalog.
+It contains only `comic-manifest` v1.0.0 at
+`contract/comic-manifest/v1.0.0`; neither the Prompt SDK nor Context Builder
+catalog or immutable bytes are republished by this catalog.
+
 Owner: @andrewperis. This is issue #72 release preparation, not evidence that
 the contracts are already published. Existing provisional notices remain true
 until the steps below complete. No release or tag is created by the builder.

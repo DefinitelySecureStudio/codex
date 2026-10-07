@@ -7,7 +7,7 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 16 * 1024 * 1024 });
 const sha = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex');
 export async function buildContractRelease(destination, catalogName = 'prompt-sdk-v1') {
-  if (!['prompt-sdk-v1', 'context-builder-v1'].includes(catalogName)) throw new Error('Unknown release catalog.');
+  if (!['prompt-sdk-v1', 'context-builder-v1', 'comic-manifest-v1'].includes(catalogName)) throw new Error('Unknown release catalog.');
   if (!destination) throw new Error('Provide a new output directory outside the checkout.');
   const output = resolve(destination), rel = relative(root, output);
   if (!rel || (!rel.startsWith('..' + '/') && !isAbsolute(rel))) throw new Error('Output must be outside the checkout.');
