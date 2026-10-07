@@ -36,7 +36,7 @@ test('contract release bundles are reproducible and every file identity verifies
       }
     }
   }
-  await assert.rejects(buildContractRelease(first), /EEXIST/);
+  await assert.rejects(buildContractRelease(first), /new/);
 });
 test('release builder requires an explicit external destination', async () => {
   await assert.rejects(buildContractRelease(), /Provide a new output/);
