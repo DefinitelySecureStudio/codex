@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, rm, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
-import { buildContractRelease } from '../scripts/build-contract-release.mjs';
+import { execFileSync } from 'node:child_process';
+import { buildContractRelease, resolveExternalOutput, verifySourceIdentity } from '../scripts/build-contract-release.mjs';
 const hash = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex');
 test('contract release bundles are reproducible and every file identity verifies', async t => {
   const root = await mkdtemp(join(tmpdir(), 'codex-release-test-'));
@@ -35,11 +36,11 @@ test('contract release bundles are reproducible and every file identity verifies
       }
     }
   }
-  await assert.rejects(buildContractRelease(first), /EEXIST/);
+  await assert.rejects(buildContractRelease(first), /new/);
 });
 test('release builder requires an explicit external destination', async () => {
   await assert.rejects(buildContractRelease(), /Provide a new output/);
-  await assert.rejects(buildContractRelease(new URL('../', import.meta.url).pathname), /outside/);
+  await assert.rejects(buildContractRelease(new URL('../', import.meta.url).pathname), /new|outside/);
   await assert.rejects(buildContractRelease('/tmp/unused', '../untrusted'), /Unknown release catalog/);
 });
 
@@ -62,4 +63,95 @@ test('Builder catalog publishes only the additive family with unchanged schema b
   for (const path of ['LICENSE', 'NOTICE', 'specs/context-builder/context-builder-v1.md', 'releases/context-builder-v1.md']) {
     assert.ok(bundle.files.some(file => file.path === path));
   }
+});
+
+test('Comic Manifest has a separate deterministic one-contract catalog', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'comic-manifest-release-test-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const first = join(root, 'first'), second = join(root, 'second');
+  const [manifest] = await buildContractRelease(first, 'comic-manifest-v1');
+  await buildContractRelease(second, 'comic-manifest-v1');
+
+  assert.equal(manifest.contract, 'comic-manifest');
+  assert.equal(manifest.version, '1.0.0');
+  assert.equal(manifest.tag, 'contract/comic-manifest/v1.0.0');
+  assert.equal(manifest.schema_id, 'urn:definitely-secure:contract:comic-manifest:1.0.0:comic-manifest');
+  assert.equal(manifest.constitution_commit, 'a9cc8a503aa30e17820edc62ac95f7cbe10e0564');
+  assert.equal(manifest.assets.length, 2);
+  assert.deepEqual(manifest.assets.map(asset => asset.filename), [
+    'comic-manifest-v1.0.0.schema.json', 'comic-manifest-v1.0.0.bundle.json'
+  ]);
+  assert.equal((await readdir(first)).length, 3);
+  for (const file of await readdir(first)) assert.deepEqual(await readFile(join(first, file)), await readFile(join(second, file)));
+
+  const schema = JSON.parse(await readFile(join(first, 'comic-manifest-v1.0.0.schema.json')));
+  assert.equal(schema.$id, manifest.schema_id);
+  for (const asset of manifest.assets) {
+    const bytes = await readFile(join(first, asset.filename));
+    assert.equal(bytes.length, asset.byte_size);
+    assert.equal(hash(bytes), asset.sha256);
+    assert.equal(asset.artifact_uri, `https://github.com/DefinitelySecureStudio/codex/releases/download/${encodeURIComponent(manifest.tag)}/${asset.filename}`);
+  }
+  const bundle = JSON.parse(await readFile(join(first, 'comic-manifest-v1.0.0.bundle.json')));
+  assert.equal(bundle.contract, 'comic-manifest');
+  assert.equal(bundle.version, '1.0.0');
+  assert.ok(bundle.files.some(file => file.path === 'LICENSE'));
+  assert.ok(bundle.files.some(file => file.path === 'NOTICE'));
+  assert.ok(bundle.files.some(file => file.path === 'releases/comic-manifest-v1.json'));
+  assert.ok(bundle.files.some(file => file.path === 'releases/comic-manifest-v1.md'));
+  assert.ok(!manifest.tag.includes('prompt-definition'));
+  assert.ok(!manifest.tag.includes('context-builder'));
+});
+
+test('release builder accepts an explicit source commit only for an exact matching tree', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'codex-release-source-identity-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const checkout = new URL('../', import.meta.url);
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd: checkout }).toString().trim();
+  const verifiedCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: checkout }).toString().trim();
+  const wrongTree = execFileSync('git', ['mktree'], { cwd: checkout, input: '' }).toString().trim();
+  const wrongCommit = execFileSync('git', ['commit-tree', wrongTree, '-m', 'release identity regression fixture'], {
+    cwd: checkout, encoding: 'utf8',
+    env: { ...process.env, GIT_AUTHOR_NAME: 'Release Fixture', GIT_AUTHOR_EMAIL: 'fixture@example.invalid',
+      GIT_COMMITTER_NAME: 'Release Fixture', GIT_COMMITTER_EMAIL: 'fixture@example.invalid' }
+  }).trim();
+  const [manifest] = await buildContractRelease(join(root, 'matching'), 'comic-manifest-v1', { commit: verifiedCommit, tree });
+  assert.equal(manifest.commit, verifiedCommit);
+  await assert.rejects(buildContractRelease(join(root, 'wrong-tree'), 'comic-manifest-v1', { commit: verifiedCommit, tree: 'b'.repeat(40) }), /exact matching local Git tree/);
+  await assert.rejects(buildContractRelease(join(root, 'non-commit-object'), 'comic-manifest-v1', { commit: tree, tree }), /not present as a verified local Git commit object/);
+  await assert.rejects(buildContractRelease(join(root, 'missing-commit'), 'comic-manifest-v1', { commit: '0'.repeat(40), tree }), /not present as a verified local Git commit object/);
+  await assert.rejects(buildContractRelease(join(root, 'wrong-commit'), 'comic-manifest-v1', { commit: wrongCommit, tree }), /exact matching local Git tree/);
+});
+
+test('release source provenance ignores Git replacement refs in an isolated repository', async t => {
+  const temp = await mkdtemp(join(tmpdir(), 'codex-release-replace-ref-'));
+  t.after(() => rm(temp, { recursive: true, force: true }));
+  const isolated = join(temp, 'repo');
+  const checkout = new URL('../', import.meta.url).pathname;
+  execFileSync('git', ['clone', '--local', '--no-hardlinks', checkout, isolated], { stdio: 'ignore' });
+  const git = (...args) => execFileSync('git', args, { cwd: isolated, encoding: 'utf8' }).trim();
+  const sourceCommit = git('rev-parse', 'HEAD');
+  const tree = git('rev-parse', 'HEAD^{tree}');
+  const emptyTree = execFileSync('git', ['mktree'], { cwd: isolated, encoding: 'utf8', input: '' }).trim();
+  const replacementCommit = execFileSync('git', [
+    '-c', 'user.name=Release Fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit-tree', emptyTree, '-p', sourceCommit, '-m', 'replacement-ref provenance fixture'
+  ], { cwd: isolated, encoding: 'utf8' }).trim();
+
+  git('replace', sourceCommit, replacementCommit);
+  assert.equal(verifySourceIdentity({ commit: sourceCommit, tree }, tree, isolated), true,
+    'a replacement ref cannot change the verified tree of a valid source commit');
+  git('replace', '-d', sourceCommit);
+  git('replace', replacementCommit, sourceCommit);
+  assert.throws(() => verifySourceIdentity({ commit: replacementCommit, tree }, tree, isolated), /exact matching local Git tree/,
+    'a replacement ref cannot make a wrong commit appear to contain the checkout tree');
+});
+
+test('release output resolution rejects symlinked parents into the checkout', async t => {
+  const temp = await mkdtemp(join(tmpdir(), 'codex-release-output-'));
+  t.after(() => rm(temp, { recursive: true, force: true }));
+  const checkout = new URL('../', import.meta.url).pathname;
+  const alias = join(temp, 'checkout-alias');
+  await symlink(checkout, alias, 'dir');
+  await assert.rejects(resolveExternalOutput(join(alias, 'artifacts')), /outside the checkout/);
 });
