@@ -64,10 +64,10 @@ export async function buildContractRelease(destination, catalogName = 'prompt-sd
   const localTree = git('rev-parse', localCommit + '^{tree}').toString().trim();
   const hasRemoteIdentity = verifySourceIdentity(sourceIdentity, localTree);
   const commit = hasRemoteIdentity ? sourceIdentity.commit : localCommit;
-  const catalog = JSON.parse(git('show', localCommit + ':releases/' + catalogName + '.json'));
-  const files = git('ls-tree', '-r', '--name-only', '-z', localCommit).toString().split('\0').filter(Boolean).sort();
+  const catalog = JSON.parse(git('show', commit + ':releases/' + catalogName + '.json'));
+  const files = git('ls-tree', '-r', '--name-only', '-z', commit).toString().split('\0').filter(Boolean).sort();
   const entries = files.map(path => {
-    const bytes = git('show', localCommit + ':' + path);
+    const bytes = git('show', commit + ':' + path);
     return { path, byte_size: bytes.length, sha256: sha(bytes), content_base64: bytes.toString('base64') };
   });
   // Includes all reviewed tracked sources so relative documentation links,
@@ -77,7 +77,7 @@ export async function buildContractRelease(destination, catalogName = 'prompt-sd
   for (const contract of catalog.contracts) {
     const tag = 'contract/' + contract.name + '/v' + catalog.version;
     const prefix = contract.name + '-v' + catalog.version;
-    const schema = git('show', localCommit + ':' + contract.schema);
+    const schema = git('show', commit + ':' + contract.schema);
     const schemaId = JSON.parse(schema).$id;
     if (!schemaId.startsWith('urn:definitely-secure:contract:' + contract.name + ':' + catalog.version + ':')) throw new Error('Schema identifier does not match catalog.');
     const bundle = Buffer.from(JSON.stringify({ format: 'studio-contract-source-bundle-v1', repository: catalog.repository, contract: contract.name, version: catalog.version, commit, files: entries }, null, 2) + '\n');

@@ -58,7 +58,7 @@ unchanged.
    public commit without tags) and confirm the GitHub commit API's tree. The
    builder independently resolves the supplied commit object's tree, requires
    it to match both the supplied tree and the clean local `HEAD` tree, then
-  reads all bundled files from that local tree. Every builder Git invocation
+  reads all bundled files from the verified source commit. Every builder Git invocation
   sets `GIT_NO_REPLACE_OBJECTS=1` for object checks and source reads, without
   changing global Git configuration. Regression tests create isolated replace
   refs and prove they cannot change either accepted or rejected commit/tree
