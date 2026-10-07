@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { buildContractRelease, resolveExternalOutput } from '../scripts/build-contract-release.mjs';
+import { buildContractRelease, resolveExternalOutput, verifySourceIdentity } from '../scripts/build-contract-release.mjs';
 const hash = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex');
 test('contract release bundles are reproducible and every file identity verifies', async t => {
   const root = await mkdtemp(join(tmpdir(), 'codex-release-test-'));
@@ -121,6 +121,30 @@ test('release builder accepts an explicit source commit only for an exact matchi
   await assert.rejects(buildContractRelease(join(root, 'non-commit-object'), 'comic-manifest-v1', { commit: tree, tree }), /not present as a verified local Git commit object/);
   await assert.rejects(buildContractRelease(join(root, 'missing-commit'), 'comic-manifest-v1', { commit: '0'.repeat(40), tree }), /not present as a verified local Git commit object/);
   await assert.rejects(buildContractRelease(join(root, 'wrong-commit'), 'comic-manifest-v1', { commit: wrongCommit, tree }), /exact matching local Git tree/);
+});
+
+test('release source provenance ignores Git replacement refs in an isolated repository', async t => {
+  const temp = await mkdtemp(join(tmpdir(), 'codex-release-replace-ref-'));
+  t.after(() => rm(temp, { recursive: true, force: true }));
+  const isolated = join(temp, 'repo');
+  const checkout = new URL('../', import.meta.url).pathname;
+  execFileSync('git', ['clone', '--local', '--no-hardlinks', checkout, isolated], { stdio: 'ignore' });
+  const git = (...args) => execFileSync('git', args, { cwd: isolated, encoding: 'utf8' }).trim();
+  const sourceCommit = git('rev-parse', 'HEAD');
+  const tree = git('rev-parse', 'HEAD^{tree}');
+  const emptyTree = execFileSync('git', ['mktree'], { cwd: isolated, encoding: 'utf8', input: '' }).trim();
+  const replacementCommit = execFileSync('git', [
+    '-c', 'user.name=Release Fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit-tree', emptyTree, '-p', sourceCommit, '-m', 'replacement-ref provenance fixture'
+  ], { cwd: isolated, encoding: 'utf8' }).trim();
+
+  git('replace', sourceCommit, replacementCommit);
+  assert.equal(verifySourceIdentity({ commit: sourceCommit, tree }, tree, isolated), true,
+    'a replacement ref cannot change the verified tree of a valid source commit');
+  git('replace', '-d', sourceCommit);
+  git('replace', replacementCommit, sourceCommit);
+  assert.throws(() => verifySourceIdentity({ commit: replacementCommit, tree }, tree, isolated), /exact matching local Git tree/,
+    'a replacement ref cannot make a wrong commit appear to contain the checkout tree');
 });
 
 test('release output resolution rejects symlinked parents into the checkout', async t => {
