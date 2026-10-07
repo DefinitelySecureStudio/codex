@@ -178,3 +178,34 @@ The owner approves this exact assessment by reviewing and merging the contract
 pull request. No provider response, schema publication, restricted raw store,
 consumer implementation, downstream use, deployment, publication, or release
 inherits approval.
+
+## Studio #99 Comic Manifest v1 release-preparation candidate — 2026-10-07
+
+Accountable owner: @andrewperis. Assessed source: Codex
+`8044643bf888067f5a6e0d212f843d72e8787f2b` plus the exact release-preparation
+candidate diff. Constitution v1.0.0, tag `constitution/v1.0.0`, Studio commit
+`a9cc8a503aa30e17820edc62ac95f7cbe10e0564`. Profiles: universal;
+repository/production-system; stable-contract release. Scope is the separate
+Comic Manifest 1.0.0 catalog, its builder path and focused tests, and the
+publication checklist. The Comic Manifest schema/specification/fixture bytes,
+five-contract Prompt SDK catalog, Context Builder catalog, locked dependencies,
+and their historical tags/assets are unchanged. Status: **Transition required**;
+this is not a release approval or publication record.
+
+The Issue 98 owner golden acceptance cited by Platform PR #41 is bounded to the
+proposed catalog/golden/oracle bytes at Platform source head
+`97dcd990e87bd0368ddcbecf66d1a6718bc7629e`, recorded in chat at
+`2026-10-07T19:15:38Z`. PR #41 states that it was not a submitted GitHub review.
+It does not approve this Codex release-preparation diff, the Codex release
+assets, a consumer adoption, or final publication. No human review of those
+release artifacts is claimed here.
+
+The current public Studio exception register says there are no active Article
+12 exceptions. This assessment therefore identifies no AI-review exception
+and relies on none. AI-assisted review and automated checks are advisory or
+bounded predicate evidence; Constitution Section 9.4 reserved judgments and
+final A4 decisions still require the authorized qualified human. The release
+gate remains open for exact-head owner/CODEOWNER review, a fresh locked-dependency
+audit, final license/NOTICE review, post-merge reproducible builds, and explicit
+owner publication approval. No tag, release, asset, npm publication, visibility
+change, production trust, or Epic #6 closeout is authorized or represented.

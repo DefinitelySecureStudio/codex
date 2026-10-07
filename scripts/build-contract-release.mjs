@@ -6,17 +6,24 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 16 * 1024 * 1024 });
 const sha = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex');
-export async function buildContractRelease(destination, catalogName = 'prompt-sdk-v1') {
+export async function buildContractRelease(destination, catalogName = 'prompt-sdk-v1', sourceIdentity = {}) {
   if (!['prompt-sdk-v1', 'context-builder-v1', 'comic-manifest-v1'].includes(catalogName)) throw new Error('Unknown release catalog.');
   if (!destination) throw new Error('Provide a new output directory outside the checkout.');
   const output = resolve(destination), rel = relative(root, output);
   if (!rel || (!rel.startsWith('..' + '/') && !isAbsolute(rel))) throw new Error('Output must be outside the checkout.');
   if (git('status', '--porcelain').length) throw new Error('Commit or remove working-tree changes before building.');
-  const commit = git('rev-parse', 'HEAD').toString().trim();
-  const catalog = JSON.parse(git('show', commit + ':releases/' + catalogName + '.json'));
-  const files = git('ls-tree', '-r', '--name-only', '-z', commit).toString().split('\0').filter(Boolean).sort();
+  const localCommit = git('rev-parse', 'HEAD').toString().trim();
+  const localTree = git('rev-parse', localCommit + '^{tree}').toString().trim();
+  const hasRemoteIdentity = sourceIdentity?.commit !== undefined || sourceIdentity?.tree !== undefined;
+  if (hasRemoteIdentity && (!/^[a-f0-9]{40}$/.test(sourceIdentity.commit ?? '') ||
+      !/^[a-f0-9]{40}$/.test(sourceIdentity.tree ?? '') || sourceIdentity.tree !== localTree)) {
+    throw new Error('Supplied source commit must be paired with its exact matching Git tree.');
+  }
+  const commit = hasRemoteIdentity ? sourceIdentity.commit : localCommit;
+  const catalog = JSON.parse(git('show', localCommit + ':releases/' + catalogName + '.json'));
+  const files = git('ls-tree', '-r', '--name-only', '-z', localCommit).toString().split('\0').filter(Boolean).sort();
   const entries = files.map(path => {
-    const bytes = git('show', commit + ':' + path);
+    const bytes = git('show', localCommit + ':' + path);
     return { path, byte_size: bytes.length, sha256: sha(bytes), content_base64: bytes.toString('base64') };
   });
   // Includes all reviewed tracked sources so relative documentation links,
@@ -26,7 +33,7 @@ export async function buildContractRelease(destination, catalogName = 'prompt-sd
   for (const contract of catalog.contracts) {
     const tag = 'contract/' + contract.name + '/v' + catalog.version;
     const prefix = contract.name + '-v' + catalog.version;
-    const schema = git('show', commit + ':' + contract.schema);
+    const schema = git('show', localCommit + ':' + contract.schema);
     const schemaId = JSON.parse(schema).$id;
     if (!schemaId.startsWith('urn:definitely-secure:contract:' + contract.name + ':' + catalog.version + ':')) throw new Error('Schema identifier does not match catalog.');
     const bundle = Buffer.from(JSON.stringify({ format: 'studio-contract-source-bundle-v1', repository: catalog.repository, contract: contract.name, version: catalog.version, commit, files: entries }, null, 2) + '\n');
@@ -42,5 +49,12 @@ export async function buildContractRelease(destination, catalogName = 'prompt-sd
   return releases;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  console.log(JSON.stringify(await buildContractRelease(process.argv[2], process.argv[3]), null, 2));
+  const options = process.argv.slice(4);
+  const identity = {};
+  for (let index = 0; index < options.length; index += 2) {
+    const key = options[index], value = options[index + 1];
+    if (!['--source-commit', '--source-tree'].includes(key) || !value || value.startsWith('--')) throw new Error('Unknown or incomplete argument.');
+    identity[key === '--source-commit' ? 'commit' : 'tree'] = value;
+  }
+  console.log(JSON.stringify(await buildContractRelease(process.argv[2], process.argv[3], identity), null, 2));
 }

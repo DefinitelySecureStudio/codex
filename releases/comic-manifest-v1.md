@@ -48,6 +48,14 @@ unchanged.
    node scripts/build-contract-release.mjs /absolute/new/codex-comic-2 comic-manifest-v1
    ```
 
+   For a local repository snapshot whose verified remote source commit has a
+   different commit object but the exact same tree, both commands may append
+   `--source-commit VERIFIED_COMMIT --source-tree VERIFIED_TREE`. The builder
+   requires the supplied tree to equal the clean local `HEAD` tree and reads
+   every file from that immutable local Git tree. Obtain both values from the
+   repository's Git commit API; do not infer them from a branch name. A normal
+   merged checkout uses `HEAD` and needs no override.
+
 4. Compare every filename and byte across both directories. Each directory has
    exactly these three expected outputs:
    `comic-manifest-v1.0.0.schema.json`,

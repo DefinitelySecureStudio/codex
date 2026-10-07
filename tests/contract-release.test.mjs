@@ -4,6 +4,7 @@ import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { buildContractRelease } from '../scripts/build-contract-release.mjs';
 const hash = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex');
 test('contract release bundles are reproducible and every file identity verifies', async t => {
@@ -100,4 +101,14 @@ test('Comic Manifest has a separate deterministic one-contract catalog', async t
   assert.ok(bundle.files.some(file => file.path === 'releases/comic-manifest-v1.md'));
   assert.ok(!manifest.tag.includes('prompt-definition'));
   assert.ok(!manifest.tag.includes('context-builder'));
+});
+
+test('release builder accepts an explicit source commit only for an exact matching tree', async t => {
+  const root = await mkdtemp(join(tmpdir(), 'codex-release-source-identity-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const tree = execFileSync('git', ['rev-parse', 'HEAD^{tree}'], { cwd: new URL('../', import.meta.url) }).toString().trim();
+  const remoteCommit = 'a'.repeat(40);
+  const [manifest] = await buildContractRelease(join(root, 'matching'), 'comic-manifest-v1', { commit: remoteCommit, tree });
+  assert.equal(manifest.commit, remoteCommit);
+  await assert.rejects(buildContractRelease(join(root, 'mismatch'), 'comic-manifest-v1', { commit: remoteCommit, tree: 'b'.repeat(40) }), /exact matching Git tree/);
 });
