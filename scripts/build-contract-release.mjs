@@ -1,23 +1,58 @@
 import { execFileSync } from 'node:child_process';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { lstat, mkdir, realpath, stat, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { resolve, relative, isAbsolute } from 'node:path';
+import { resolve, relative, isAbsolute, sep, dirname, basename } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 16 * 1024 * 1024 });
 const sha = bytes => 'sha256:' + createHash('sha256').update(bytes).digest('hex');
+
+export async function resolveExternalOutput(destination, checkoutRoot = root) {
+  if (!destination) throw new Error('Provide a new output directory outside the checkout.');
+  const requested = resolve(destination), missing = [];
+  let ancestor = requested;
+  while (true) {
+    try { await lstat(ancestor); break; }
+    catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      const parent = dirname(ancestor);
+      if (parent === ancestor) throw error;
+      missing.unshift(basename(ancestor));
+      ancestor = parent;
+    }
+  }
+  if (!missing.length) throw new Error('Output directory must be new.');
+  const physicalAncestor = await realpath(ancestor);
+  if (!(await stat(physicalAncestor)).isDirectory()) throw new Error('Output path must descend from an existing directory.');
+  const output = resolve(physicalAncestor, ...missing);
+  const checkout = await realpath(checkoutRoot);
+  const rel = relative(checkout, output);
+  if (!rel || (!rel.startsWith('..' + sep) && rel !== '..' && !isAbsolute(rel))) {
+    throw new Error('Output must be outside the checkout.');
+  }
+  return output;
+}
+
 export async function buildContractRelease(destination, catalogName = 'prompt-sdk-v1', sourceIdentity = {}) {
   if (!['prompt-sdk-v1', 'context-builder-v1', 'comic-manifest-v1'].includes(catalogName)) throw new Error('Unknown release catalog.');
-  if (!destination) throw new Error('Provide a new output directory outside the checkout.');
-  const output = resolve(destination), rel = relative(root, output);
-  if (!rel || (!rel.startsWith('..' + '/') && !isAbsolute(rel))) throw new Error('Output must be outside the checkout.');
+  const output = await resolveExternalOutput(destination);
   if (git('status', '--porcelain').length) throw new Error('Commit or remove working-tree changes before building.');
   const localCommit = git('rev-parse', 'HEAD').toString().trim();
   const localTree = git('rev-parse', localCommit + '^{tree}').toString().trim();
   const hasRemoteIdentity = sourceIdentity?.commit !== undefined || sourceIdentity?.tree !== undefined;
-  if (hasRemoteIdentity && (!/^[a-f0-9]{40}$/.test(sourceIdentity.commit ?? '') ||
-      !/^[a-f0-9]{40}$/.test(sourceIdentity.tree ?? '') || sourceIdentity.tree !== localTree)) {
-    throw new Error('Supplied source commit must be paired with its exact matching Git tree.');
+  if (hasRemoteIdentity) {
+    if (!/^[a-f0-9]{40}$/.test(sourceIdentity.commit ?? '') || !/^[a-f0-9]{40}$/.test(sourceIdentity.tree ?? '')) {
+      throw new Error('Supplied source identity must use full Git commit and tree IDs.');
+    }
+    let verifiedTree;
+    try {
+      if (git('cat-file', '-t', sourceIdentity.commit).toString().trim() !== 'commit') throw new Error('not a commit object');
+      verifiedTree = git('rev-parse', sourceIdentity.commit + '^{tree}').toString().trim();
+    }
+    catch { throw new Error('Supplied source commit is not present as a verified local Git commit object.'); }
+    if (verifiedTree !== sourceIdentity.tree || verifiedTree !== localTree) {
+      throw new Error('Supplied source commit must resolve to the exact matching local Git tree.');
+    }
   }
   const commit = hasRemoteIdentity ? sourceIdentity.commit : localCommit;
   const catalog = JSON.parse(git('show', localCommit + ':releases/' + catalogName + '.json'));

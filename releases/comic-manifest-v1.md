@@ -53,11 +53,14 @@ unchanged.
 
    For a local repository snapshot whose verified remote source commit has a
    different commit object but the exact same tree, both commands may append
-   `--source-commit VERIFIED_COMMIT --source-tree VERIFIED_TREE`. The builder
-   requires the supplied tree to equal the clean local `HEAD` tree and reads
-   every file from that immutable local Git tree. Obtain both values from the
-   repository's Git commit API; do not infer them from a branch name. A normal
-   merged checkout uses `HEAD` and needs no override.
+   `--source-commit VERIFIED_COMMIT --source-tree VERIFIED_TREE`. First make
+   the source commit object available locally (for example, fetch that exact
+   public commit without tags) and confirm the GitHub commit API's tree. The
+   builder independently resolves the supplied commit object's tree, requires
+   it to match both the supplied tree and the clean local `HEAD` tree, then
+   reads all bundled files from that local tree. A commit-shaped caller string
+   without a verified local commit object fails closed. A normal merged
+   checkout uses `HEAD` and needs no override.
 
 4. Compare every filename and byte across both directories. Each directory has
    exactly these three expected outputs:
