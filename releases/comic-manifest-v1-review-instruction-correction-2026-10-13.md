@@ -31,7 +31,7 @@ erase the owner’s instruction or convert it into an exception.
 This correction concerns the description of the past code-review instruction only.
 It does not alter the owner’s separate exact-artifact publication approvals, any
 published bytes, the Codex tag `contract/comic-manifest/v1.0.0` or its target
-`12e437e30328a3bb9cd2d15e6307a70b4b7e0e2a), or any release asset. No exception is
+`12e437e30328a3bb9cd2d15e6307a70b4b7e0e2a`, or any release asset. No exception is
 created, renewed, backdated or requested. No constitutional policy is amended or
 weakened, and no whole-history `Conforming` status is claimed. The historical
 review-record finding remains as recorded in the accepted Studio closeout
