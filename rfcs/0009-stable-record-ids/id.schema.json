@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed UUIDv4 record identity profile 0.1.0 (RFC 0009 only)",
+  "type": "string",
+  "pattern": "^record\\.(character|location|relationship)\\.[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+  "maxLength": 56,
+  "not": {
+    "pattern": "[^a-z0-9.\\-]"
+  }
+}

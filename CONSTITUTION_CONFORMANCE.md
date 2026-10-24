@@ -1,5 +1,21 @@
 # Constitution conformance record
 
+## Stable record ID proposal — 2026-10-24
+
+Owner and required decision reviewer: @andrewperis. Constitution 1.0.0 at
+`a9cc8a503aa30e17820edc62ac95f7cbe10e0564`; assessed base
+`ba64020042a8a7e4d4abaf3abc4e5fdfd489fea0` plus the RFC 0009 proposal diff.
+Profile: ADR/RFC/stable specification. Status: proposed, pending owner and
+affected consumer review; no acceptance or broader conformance completion claim.
+Evidence: RFC 0009, proposal-local ID schema, synthetic inventory/reference cases
+and `tests/stable-record-ids.test.cjs`. Scope: technical record identity
+application profile over RFC 9562 UUIDv4 only;
+released contracts, source provenance semantics and immutable artifacts unchanged.
+No exception requested. Inventory ownership, reservation workflow and any legacy
+scheme compatibility must be decided before adoption. Review on format, identity,
+classification, issuance, reference or consumer changes and before acceptance.
+Private allocation, creative content, production validation and release are excluded.
+
 ## Studio #86 release preparation — 2026-09-16
 
 Owner: @andrewperis. Constitution 1.0.0 at

@@ -1,0 +1,203 @@
+{
+  "valid": [
+    "record.character.811bf47e-b3d6-4815-a3a3-b6c39c886f9b",
+    "record.location.c7b9fa21-6342-4701-ae20-d0e299231239",
+    "record.relationship.7f157e6c-8056-4ca4-87d6-72aeca26ad8e"
+  ],
+  "invalid": [
+    {
+      "name": "context source identity is not a record ID",
+      "id": "urn:uuid:811bf47e-b3d6-4815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "bare UUID lacks typed prefix",
+      "id": "811bf47e-b3d6-4815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "uppercase suffix is RFC-valid but outside this profile",
+      "id": "record.character.811BF47E-B3D6-4815-A3A3-B6C39C886F9B"
+    },
+    {
+      "name": "mixed case suffix is outside this profile",
+      "id": "record.character.811bf47e-b3d6-4815-A3A3-B6C39C886F9B"
+    },
+    {
+      "name": "trailing newline",
+      "id": "record.character.811bf47e-b3d6-4815-a3a3-b6c39c886f9b\n"
+    },
+    {
+      "name": "leading whitespace",
+      "id": " record.character.811bf47e-b3d6-4815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "truncated suffix",
+      "id": "record.character.811bf47e-b3d6-4815-a3a3-b6c39c886f9"
+    },
+    {
+      "name": "extra digit",
+      "id": "record.character.811bf47e-b3d6-4815-a3a3-b6c39c886f9b0"
+    },
+    {
+      "name": "unknown record kind",
+      "id": "record.asset.811bf47e-b3d6-4815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "nonhex suffix",
+      "id": "record.character.g11bf47e-b3d6-4815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "legacy unhyphenated encoding",
+      "id": "record.character.811bf47eb3d64815a3a3b6c39c886f9b"
+    },
+    {
+      "name": "colon separators",
+      "id": "record.character.811bf47e:b3d6:4815:a3a3:b6c39c886f9b"
+    },
+    {
+      "name": "braced suffix",
+      "id": "record.character.{811bf47e-b3d6-4815-a3a3-b6c39c886f9b}"
+    },
+    {
+      "name": "URN suffix under typed prefix",
+      "id": "record.character.urn:uuid:811bf47e-b3d6-4815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "nil UUID",
+      "id": "record.character.00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "name": "max UUID",
+      "id": "record.character.ffffffff-ffff-ffff-ffff-ffffffffffff"
+    },
+    {
+      "name": "version nibble 0 is not v4",
+      "id": "record.character.811bf47e-b3d6-0815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble 1 is not v4",
+      "id": "record.character.811bf47e-b3d6-1815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble 2 is not v4",
+      "id": "record.character.811bf47e-b3d6-2815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble 3 is not v4",
+      "id": "record.character.811bf47e-b3d6-3815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble 5 is not v4",
+      "id": "record.character.811bf47e-b3d6-5815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble 6 is not v4",
+      "id": "record.character.811bf47e-b3d6-6815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble 7 is not v4",
+      "id": "record.character.811bf47e-b3d6-7815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble 8 is not v4",
+      "id": "record.character.811bf47e-b3d6-8815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble 9 is not v4",
+      "id": "record.character.811bf47e-b3d6-9815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble a is not v4",
+      "id": "record.character.811bf47e-b3d6-a815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble b is not v4",
+      "id": "record.character.811bf47e-b3d6-b815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble c is not v4",
+      "id": "record.character.811bf47e-b3d6-c815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble d is not v4",
+      "id": "record.character.811bf47e-b3d6-d815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble e is not v4",
+      "id": "record.character.811bf47e-b3d6-e815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "version nibble f is not v4",
+      "id": "record.character.811bf47e-b3d6-f815-a3a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble 0 is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-03a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble 1 is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-13a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble 2 is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-23a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble 3 is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-33a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble 4 is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-43a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble 5 is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-53a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble 6 is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-63a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble 7 is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-73a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble c is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-c3a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble d is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-d3a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble e is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-e3a3-b6c39c886f9b"
+    },
+    {
+      "name": "variant nibble f is not 10xx",
+      "id": "record.character.811bf47e-b3d6-4815-f3a3-b6c39c886f9b"
+    }
+  ],
+  "records": [
+    {
+      "id": "record.character.811bf47e-b3d6-4815-a3a3-b6c39c886f9b",
+      "name": "Example Character"
+    },
+    {
+      "id": "record.location.c7b9fa21-6342-4701-ae20-d0e299231239",
+      "name": "Example Location"
+    },
+    {
+      "id": "record.relationship.7f157e6c-8056-4ca4-87d6-72aeca26ad8e",
+      "endpoints": [
+        "record.character.811bf47e-b3d6-4815-a3a3-b6c39c886f9b",
+        "record.location.c7b9fa21-6342-4701-ae20-d0e299231239"
+      ]
+    }
+  ],
+  "rename": {
+    "id": "record.character.811bf47e-b3d6-4815-a3a3-b6c39c886f9b",
+    "name": "Renamed Character"
+  },
+  "missing": "record.character.bd89b679-d865-4645-bdb1-5bbc7509dfcb"
+}
