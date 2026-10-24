@@ -1,0 +1,39 @@
+{
+  "valid": [
+    "record.character.11111111111111111111111111111111",
+    "record.location.22222222222222222222222222222222",
+    "record.relationship.33333333333333333333333333333333"
+  ],
+  "invalid": [
+    "source.synthetic-1",
+    "RECORD.CHARACTER.11111111111111111111111111111111",
+    "record.character.11111111111111111111111111111111\n",
+    " record.character.11111111111111111111111111111111",
+    "record.character.1111111111111111111111111111111",
+    "record.character.111111111111111111111111111111110",
+    "record.asset.11111111111111111111111111111111",
+    "record.character.gggg1111111111111111111111111111"
+  ],
+  "records": [
+    {
+      "id": "record.character.11111111111111111111111111111111",
+      "name": "Example Character"
+    },
+    {
+      "id": "record.location.22222222222222222222222222222222",
+      "name": "Example Location"
+    },
+    {
+      "id": "record.relationship.33333333333333333333333333333333",
+      "endpoints": [
+        "record.character.11111111111111111111111111111111",
+        "record.location.22222222222222222222222222222222"
+      ]
+    }
+  ],
+  "rename": {
+    "id": "record.character.11111111111111111111111111111111",
+    "name": "Renamed Character"
+  },
+  "missing": "record.character.44444444444444444444444444444444"
+}

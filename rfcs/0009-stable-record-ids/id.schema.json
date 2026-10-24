@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proposed stable record ID 0.1.0 (RFC 0009 only)",
+  "type": "string",
+  "pattern": "^record\\.(character|location|relationship)\\.[0-9a-f]{32}$",
+  "maxLength": 52,
+  "not": {
+    "pattern": "[^a-z0-9.]"
+  }
+}

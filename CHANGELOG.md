@@ -11,6 +11,10 @@ compatible, or editorial.
 
 ## Unreleased
 
+- Propose stable record IDs 0.1.0 in Draft RFC 0009 (new additive family),
+  with synthetic syntax and inventory/reference conformance evidence. No
+  existing or released contract semantics change; adoption remains undecided.
+
 - Clarified the unreleased Comic Manifest 1.0.0 candidate's (#95 prerequisite)
   detached approval time bounds: decision time is inclusive, expiry is exclusive
   at both action and scoped publication time. The test-only oracle preserves
