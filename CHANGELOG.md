@@ -12,7 +12,9 @@ compatible, or editorial.
 ## Unreleased
 
 - Propose stable record IDs 0.1.0 in Draft RFC 0009 (new additive family),
-  with synthetic syntax and inventory/reference conformance evidence. No
+  built on RFC 9562 UUIDv4 with standard hyphenated lowercase suffixes, pinpoint
+  standards references, and synthetic syntax/version/variant and inventory/reference
+  conformance evidence. Prefix and identity lifecycle rules remain application policy. No
   existing or released contract semantics change; adoption remains undecided.
 
 - Clarified the unreleased Comic Manifest 1.0.0 candidate's (#95 prerequisite)

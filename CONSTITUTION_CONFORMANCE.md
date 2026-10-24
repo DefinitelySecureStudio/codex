@@ -8,7 +8,8 @@ Owner and required decision reviewer: @andrewperis. Constitution 1.0.0 at
 Profile: ADR/RFC/stable specification. Status: proposed, pending owner and
 affected consumer review; no acceptance or broader conformance completion claim.
 Evidence: RFC 0009, proposal-local ID schema, synthetic inventory/reference cases
-and `tests/stable-record-ids.test.cjs`. Scope: technical record identity only;
+and `tests/stable-record-ids.test.cjs`. Scope: technical record identity
+application profile over RFC 9562 UUIDv4 only;
 released contracts, source provenance semantics and immutable artifacts unchanged.
 No exception requested. Inventory ownership, reservation workflow and any legacy
 scheme compatibility must be decided before adoption. Review on format, identity,

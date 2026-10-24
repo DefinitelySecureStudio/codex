@@ -30,7 +30,7 @@ function inventory(records, retired = []) {
 }
 test('proposed ID schema accepts only exact canonical strings', () => {
   for (const id of cases.valid) assert.equal(validate(id), true, id);
-  for (const id of cases.invalid) assert.equal(validate(id), false, JSON.stringify(id));
+  for (const { name, id } of cases.invalid) assert.equal(validate(id), false, name);
 });
 test('proposed IDs fit existing context safeId syntax without equating identities', () => {
   const context = read('schemas/json/context-packages/v1/context-package.schema.json');
@@ -59,4 +59,26 @@ test('missing and wrong-kind endpoints fail; incomplete inventories cannot pass'
     assert.throws(() => inventory(records), /endpoint/);
   }
   assert.throws(() => inventory(cases.records.slice(1)), /unresolved/);
+});
+
+test('all RFC 9562 variant 10xx nibbles pass the lowercase v4 profile', () => {
+  const [prefix, kind, uuid] = cases.valid[0].split('.');
+  for (const variant of '89ab') {
+    assert.equal(validate(`${prefix}.${kind}.${uuid.slice(0, 19)}${variant}${uuid.slice(20)}`), true);
+  }
+});
+test('synthetic UUIDv4 suffixes have the standard layout without changing context URNs', () => {
+  const { randomUUID } = require('node:crypto');
+  // Ephemeral synthetic sample only: validates generator/profile integration, not entropy quality.
+  assert.equal(validate(`record.character.${randomUUID()}`), true);
+  const context = read('schemas/json/context-builder/v1/context-builder.schema.json');
+  const validateContextId = new Ajv({ strict: true }).compile(context.$defs.opaque);
+  for (const id of cases.valid) {
+    const uuid = id.split('.').at(-1);
+    assert.equal(uuid.length, 36);
+    assert.equal(uuid[14], '4');
+    assert.ok('89ab'.includes(uuid[19]));
+    assert.equal(validateContextId(`urn:uuid:${uuid}`), true);
+    assert.equal(validateContextId(id), false);
+  }
 });
