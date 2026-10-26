@@ -7,4 +7,6 @@ human-readable naming conventions belong here.
 UUIDv4 application profile for stable character, location and relationship
 record IDs. It is unreleased: the proposal-local schema is not a canonical
 released schema, and production allocations still require the private
-owner-reviewed inventory process.
+owner-reviewed inventory process. Production use also requires an immutable
+contract release and separately reviewed consumer adoption under the
+[change-control policy](../../docs/change-control.md).
