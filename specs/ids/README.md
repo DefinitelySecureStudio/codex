@@ -3,6 +3,8 @@
 Stable identifier formats, namespaces, uniqueness rules, normalization, and
 human-readable naming conventions belong here.
 
-[RFC 0009](../../rfcs/0009-stable-record-ids.md) proposes a UUIDv4 application profile for
-stable record IDs for characters, locations and relationships. It is Draft, not an accepted
-contract or authority to allocate production IDs.
+[RFC 0009](../../rfcs/0009-stable-record-ids.md) defines the accepted 0.1.0
+UUIDv4 application profile for stable character, location and relationship
+record IDs. It is unreleased: the proposal-local schema is not a canonical
+released schema, and production allocations still require the private
+owner-reviewed inventory process.
