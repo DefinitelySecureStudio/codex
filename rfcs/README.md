@@ -25,6 +25,7 @@ RFC filenames use four-digit numbers and a concise kebab-case title:
 a proposal. Allocate the next number when the pull request opens; numbers are
 never reused.
 
-Accepted candidates include Prompt Definition v1 (RFC 0001), Provider Execution
-v1 (RFC 0002), Context Package v1 (RFC 0003), and Structured Output v1 (RFC
-0004).
+Accepted decisions include Prompt Definition v1 (RFC 0001), Provider Execution
+v1 (RFC 0002), Context Package v1 (RFC 0003), Structured Output v1 (RFC 0004),
+and the unreleased UUIDv4 application profile 0.1.0 (RFC 0009). RFC 0009 has no
+released schema, consumer migration, or production integration yet.
