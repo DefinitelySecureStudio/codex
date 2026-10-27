@@ -156,7 +156,7 @@ when the injected reader verifies the exact event and its identity.
 | Outcome recorded | Outcome maps under RFC 0010 | Reuse RFC 0010's existing result/diagnostic mapping, freeze candidate result bytes and identity, and continue through its `result-prepared` and `persisting` states. | `timed-out` remains `contract-mapping-blocked` with the exact outcome recoverable by ID; this RFC does not map it to a Manifest status or retry it. |
 | Persisting | Readback and terminal link | Verify exact immutable bytes and the terminal index entry per RFC 0010. Only a confirmed terminal link is terminal. | Ambiguous write/link, mismatch, or unreadable state remains nonterminal and requires reconciliation; no overwrite or substitute IDs. |
 | Terminal and reconciled | Explicit retry request | Apply the eligibility checks below. If all pass, create a fresh attempt under the original job, preserving the prior attempt/result and pinned production revision. | No automatic retry. Exhausted limits, changed revision, cancelled job, blocked timeout, or unresolved prior state deny the retry. |
-| Any admitted nonterminal state | Time deadline expires | Append/confirm `budget-exhausted` with reason `time` when metadata capacity permits; keep prior evidence intact. If an attempt has reached `dispatch-started`, request cancellation once if the call is in flight, then allow only preservation/finalization of that same attempt within its already reserved material budget. | No new provider call or retry. If outcome/persistence is uncertain, remain unresolved; do not claim terminal. |
+| Any admitted nonterminal state | Time deadline expires | During live execution, append/confirm `budget-exhausted` with reason `time` when metadata capacity permits; keep prior evidence intact. If an attempt has reached `dispatch-started`, request cancellation once if the call is in flight, then allow only preservation/finalization of that same attempt within its already reserved material budget. After restart, require the scoped authorization below before any marker or cancellation signal. | No new provider call or retry. If outcome/persistence is uncertain, remain unresolved; do not claim terminal. |
 | Any admitted nonterminal state | Material budget is exhausted | Append/confirm `budget-exhausted` with reason `material` from the reserved metadata allowance when possible. Keep prior evidence; allow only read-only reconciliation and control metadata within its reserve. | No new payload read/write, provider call, retry, or unbudgeted result. If a required payload cannot fit, remain unresolved; do not claim terminal. |
 
 The `dispatch-started` marker is a proposed O03 addition needed to distinguish
@@ -174,7 +174,10 @@ normalized outcome that returns, even after the deadline. Bounded persistence
 and terminalization of that already-started attempt may continue within its
 previously reserved material budget; they do not reset the deadline or permit
 another provider call or retry. If the required payload does not fit, or the
-outcome/terminal state cannot be verified, the attempt stays unresolved.
+outcome/terminal state cannot be verified, the attempt stays unresolved. If the
+process restarts before that cancellation/preservation transition is confirmed,
+recovery is read-only by default; after deadline expiry, explicit authorization
+cannot advance the outcome or append the terminal link.
 Provider Execution's own `timeout_ms` continues to be evaluated from adapter
 invocation start exactly as defined in that contract. This host budget does not
 silently replace or reinterpret it.
@@ -249,31 +252,50 @@ cannot establish this fact, deny retry and retain evidence for reconciliation.
 
 ### Resume and reconciliation
 
-On restart, the host MUST read the protected index and verify the pinned
-production reference before any action. It MUST reconstruct consumed time and
-resource budgets from confirmed entries. Missing/unreadable counters, an epoch
-mismatch, or a changed revision blocks new calls and retries. It MUST NOT infer
-state from local memory, a directory listing, a mutable branch name, or an
-unverified cache.
+Restart recovery is read-only by default. It may inspect the protected index,
+verify the pinned production reference, read outcomes/results, and reconstruct
+budgets. It MUST NOT append an index record, prepare/advance an attempt, signal
+a provider call, or write a result after restart without explicit caller/owner
+authorization scoped to that job and its single next transition. A previous
+job request or pre-restart authorization does not silently authorize restart
+mutations. A new explicit cancellation instruction may authorize only its
+cancellation marker/signal for a verified existing execution ID, not dispatch
+or result advancement. Read-only verification itself does not change state.
 
-| Recovered state | Permitted resume action | Prohibited action |
-|---|---|---|
-| `admitted`, no attempt prepared | Prepare only if the original clock epoch and deadline verify, cancellation is absent, and all budgets remain. | Reset the start time/deadline; infer the production revision from a mutable ref. |
-| `prepared`, no `dispatch-started` entry, and reader confirms absence | Continue to dispatch once after rechecking identity, cancellation, deadline, and budgets; or record pre-dispatch cancellation. | Call if marker absence is uncertain; create replacement IDs after an uncertain preparation. |
-| `dispatch-started`, no verified `provider-outcome` | Mark `execution-unresolved`; preserve IDs and seek outcome by `execution_id`. | Redeliver the provider call, allocate another execution ID to disguise a retry, or assume no call occurred. |
-| Verified `provider-outcome` | Reuse those exact bytes to continue deterministic outcome mapping and result preparation, subject to the original pinned revision and remaining material budget. After time expiry, only preservation/finalization of this existing attempt is allowed. | Call the provider again, retry, or normalize the same outcome differently to bypass a blocked state. |
-| `contract-mapping-blocked` for timeout | Keep the result recoverable and blocked; allow read-only evidence retrieval. | Invent a timeout diagnostic, create a Comic Manifest result, retry, or auto-finalize. |
-| `persisting`, candidate result bytes and digest verified | Read by fixed `result_id`; if matching immutable bytes exist, verify them and use explicit reconciliation to confirm the terminal link. | Change candidate bytes/IDs or repeat the immutable result write while its prior outcome is uncertain. |
-| Terminal link confirmed and result bytes verify | Return the existing immutable result. | Add another terminal result, mutate lineage, or execute again under the same attempt. |
-| Any unreadable, conflicting, or ambiguous state | Mark `reconciliation-required`; retain fixed IDs and verified evidence; allow read-only inspection. | Treat uncertainty as absence, success, failure, or retry permission. |
+Before accepting such authorization, the host MUST verify the original pinned
+revision, original `clock_epoch_id` and deadline, persisted counters, any
+existing IDs, and absence of conflicting allocations. An absent ID may be
+allocated once only for the authorized next transition; an uncertain ID is
+never replaced. The authorization MUST NOT reset the deadline or budgets,
+change the revision, override an expired deadline or ambiguous side effect, or
+bypass `contract-mapping-blocked`. It permits at most the specific previously
+prepared transition listed below; it is not a new job or retry authorization.
+The original deadline MUST still be unexpired for restart-driven preparation,
+dispatch, outcome advancement, or terminal linking. After expiry, only reads
+and an explicitly requested cancellation-only marker/signal are permitted.
 
-An explicit reconciliation can continue only an exact, previously prepared
-transition after the reader establishes the prior side effect's outcome and the
-identity verifier confirms the same bytes. It cannot authorize a new provider
-call, change a production revision, or reset any budget. If the reader cannot
-prove whether an append/write occurred, the job remains unresolved; do not
-blindly repeat it. Reconciliation authority is a separate caller/owner gate,
-not granted by this draft or by an index entry.
+| Recovered state | Default on restart | Permitted after explicit scoped authorization | Always prohibited |
+|---|---|---|---|
+| `admitted`, no attempt prepared | Read and verify only. | Prepare one attempt under the existing `job_id` if the original clock epoch/deadline, cancellation state, and all reservations permit. Allocate IDs once; if the prepare append is uncertain, reconcile without replacement IDs. | Reset deadline/budgets or infer the revision from a mutable ref. |
+| `prepared`, reader confirms no `dispatch-started` entry | Read and verify only. | Append `dispatch-started` with the existing attempt/execution IDs and invoke that call at most once, after rechecking the exact revision, deadline, cancellation, and reservations. | Call if marker absence is uncertain; allocate replacement IDs; dispatch after deadline/epoch uncertainty. |
+| `dispatch-started`, no verified `provider-outcome` | Read-only lookup by the existing `execution_id`; classify as `execution-unresolved` without appending a new record. | No call authorization is available. A separate explicit cancellation request may signal this verified execution once; otherwise continue read-only outcome lookup/reconciliation. | Redeliver the call, use a new execution ID, or treat missing/unreadable outcome as proof no call occurred. |
+| Verified `provider-outcome` | Read and verify exact bytes only. | Before the original deadline expires, continue deterministic mapping and persistence from those bytes, reusing all existing IDs. Allocate a `result_id` once only if none was allocated before restart; never replace an uncertain ID. | After deadline expiry, perform read-only inspection only; do not advance to persistence. Call again, retry, or normalize the same outcome differently to bypass a blocked state. |
+| `contract-mapping-blocked` for timeout | Read-only evidence retrieval. | No advancement authorization is defined in this draft; a separately versioned mapping decision is required. | Invent a timeout diagnostic, create a Comic Manifest result, retry, or auto-finalize. |
+| `persisting`, candidate result bytes and digest verified | Read by fixed `result_id` and verify whether exact immutable bytes and terminal-link state exist. | Before the original deadline expires, if the immutable result matches and the reader proves the terminal link is absent, append that one terminal link using the existing IDs. | After deadline expiry, inspect only; do not append a terminal link. Also do not change candidate bytes/IDs, repeat the immutable result write, or append a terminal link when absence is uncertain. |
+| Terminal link confirmed and result bytes verify | Return the existing immutable result. | No mutation is needed. | Add another terminal result, mutate lineage, or execute again under the same attempt. |
+| Any unreadable, conflicting, or ambiguous state | Read-only inspection; retain the last verified state. | Authorization cannot resolve unknown side-effect outcomes; only a later read that establishes them can unblock a transition. | Treat uncertainty as absence, success, failure, or retry permission. |
+
+No restart path silently resumes or retries. A prepared attempt can be dispatched
+after restart only when the reader proves `dispatch-started` is absent and a
+caller/owner explicitly authorizes that one dispatch with the original IDs.
+Once `dispatch-started` exists or its presence is uncertain, authorization
+cannot authorize another call. A recorded outcome can be advanced to result
+persistence only after explicit authorization; a persisted result can be
+terminal-linked only after readback verifies its exact bytes and the reader
+proves the link is absent. If the reader cannot prove whether an append/write
+occurred, the job remains unresolved; do not blindly repeat it. Reconciliation
+authority is a separate caller/owner gate, not granted by this draft or by an
+index entry.
 
 ## Finite synthetic fixture expectations
 
@@ -286,8 +308,12 @@ Comic Manifest fixture; no real provider or protected source is involved.
 | Concurrency boundary | One job is admitted; submit a second before the first is terminal. | Second job is rejected before ID allocation/provider call; no implicit queue. |
 | Deadline below boundary | Inject monotonic elapsed time of 299,999 ms, then request an eligible retry with `retry_after_ms` already satisfied. | A retry may dispatch only while the original deadline still has positive time remaining and all other checks pass; original admission tick remains unchanged. |
 | Deadline at/over boundary | Inject elapsed time of 300,000 ms or more before an initial/retry dispatch. | No dispatch marker or provider call is started; job is `budget-exhausted` for time. A call already started at positive budget is not redelivered; its existing outcome may still be preserved/finalized within material limits. |
-| Restart with same clock epoch | Resume a confirmed `prepared` job before its original deadline, with no `dispatch-started` marker and unchanged production identity. | Reuse the fixed attempt/execution IDs and dispatch exactly once after reconfirming budgets. |
-| Restart with changed epoch | The index is intact but the injected clock reports a different epoch or cannot prove elapsed time. | Mark `deadline-unverifiable`; no call, retry, or reset. Read-only reconciliation remains available. |
+| Restart read-only default | Restart separately from `prepared` with marker absence verified, `provider-outcome`, and `persisting`, without recovery authorization. | Inspect and verify only; zero index writes, zero provider calls, and no IDs allocated or replaced or state advanced. |
+| Authorized recovery from `prepared` | After read-only inspection, caller/owner authorizes one continuation; marker absence is proven; original revision, epoch, deadline, reservations, and attempt/execution IDs all verify. | Append one `dispatch-started` entry using the existing IDs and make at most one call. A second recovery after that marker exists performs no call. |
+| Authorized recovery from `provider-outcome` | Exact outcome and pinned revision verify; original deadline remains unexpired; caller/owner authorizes only advancement to result preparation/persistence. | Reuse the same job/attempt/execution IDs and exact outcome bytes; no provider call. Any result ID is allocated once only if previously absent. |
+| Authorized recovery from `persisting` | Exact result bytes verify; reader confirms the terminal link is absent; original deadline remains unexpired; caller/owner authorizes terminal-link completion. | Append the terminal link at most once using the existing result ID; do not rewrite bytes or allocate a replacement ID. |
+| Restarted in-flight cancellation | `dispatch-started` and its exact execution ID are verified; no outcome is recorded; caller explicitly requests cancellation after restart. | Send one cancellation signal to that existing execution ID; do not dispatch, retry, write a result, or allocate IDs. Resume outcome lookup read-only. |
+| Restart with changed epoch | The index is intact but the injected clock reports a different epoch or cannot prove elapsed time. | Classify the recovered job as `deadline-unverifiable` during read-only inspection; no index write, call, retry, or reset. |
 | Resource boundary | Inputs and unique material total exactly 128 MiB, then one additional byte is required. | Exactly-at-cap work can continue if all other limits pass; reject the extra byte before allocation, provider call, or write. Checked arithmetic overflow fails closed. |
 | Component resource boundary | Prompt or normalized provider output is exactly its 8/16 MiB cap, then one byte over; artifact total exactly 64 MiB, then one additional byte is required. | At-boundary inputs/results may proceed if aggregate capacity remains. Reject over-bound prompts before the call, stop/reject over-bound provider output before normalization, and reject an additional artifact before write; preserve earlier records. |
 | Existing Manifest parser boundary | Use an 8 MiB document at the existing parser limits, then one over the bound; separately exceed depth 32, 100,000 values, or 32,768 UTF-8 bytes in a string. | At-boundary input proceeds to schema validation; each over-bound input is rejected before execution with no partial parse treated as success. |
@@ -300,9 +326,10 @@ Comic Manifest fixture; no real provider or protected source is involved.
 | Eligible retry | First attempt is terminal/reconciled, failed with `rate-limit`, `retryable=true`, `retry_after_ms`, safe provider detail `RATE_LIMITED_BEFORE_ACCEPTANCE`, no output, same production identity, positive budgets, and explicit caller retry. | Exactly one new attempt with new attempt/execution/result IDs and `retry_of_attempt_id`; prior records unchanged; one provider call. |
 | Retry denials | Repeat with cap exhausted, deadline expired, insufficient bytes, no explicit caller action, missing retry delay, `retryable=false`, changed revision, cancellation, timeout, or ambiguous call/write. | Reject before any new provider call; preserve evidence and prior records. |
 | Retry delay exceeds budget | Eligible `rate-limit` result has `retry_after_ms` greater than the remaining job deadline. | Deny retry; do not reset the deadline or shorten the provider-specified delay. |
-| Recovery from `provider-outcome` | Confirm outcome record and unchanged production identity; no result prepared yet. | Resume mapping from the exact stored outcome without another provider call. A timeout remains `contract-mapping-blocked`. |
-| Recovery from `persisting` | Result bytes match the fixed digest; terminal link absent and reader verifies absence. | Permit only explicit reconciliation to link the already verified immutable bytes; do not repeat result write or allocate a new ID. If link absence is uncertain, remain unresolved. |
+| Recovery from `provider-outcome` | Confirm outcome record and unchanged production identity; original deadline remains unexpired; caller/owner explicitly authorizes advancement. | Resume mapping from the exact stored outcome without another provider call. A timeout remains `contract-mapping-blocked`. |
+| Recovery from `persisting` | Result bytes match the fixed digest; terminal link absent and reader verifies absence; original deadline remains unexpired; caller/owner explicitly authorizes completion. | Permit only explicit reconciliation to link the already verified immutable bytes; do not repeat result write or allocate a new ID. If link absence is uncertain, remain unresolved. |
 | Corrupt or unreadable recovery state | Index, result, or production bytes conflict or cannot be read. | `reconciliation-required`; no call, retry, overwrite, assumed absence, or fabricated terminal result. |
+| Recovery authorization cannot override blockers | An authorization is present but the deadline is expired, the clock epoch is unknown, the revision changed, the dispatch marker may exist, or a write is unresolved. | Keep recovery read-only and blocked; do not dispatch, advance, retry, or replace IDs. |
 
 The existing repository test suite and CI validate current contracts and build
 health. They do not execute these proposed O03 semantic fixtures unless a later
@@ -353,8 +380,8 @@ reconciliation must establish the prior call outcome before further work.
 ## Implementation plan
 
 1. Record the contract owner's decisions on the proposed numeric limits,
-   `job_id`/`dispatch-started` host index, clock-epoch behavior, cancellation
-   mapping, and retry allowlist.
+   `job_id`/`dispatch-started` host index, restart authorization, clock-epoch
+   behavior, cancellation mapping, and retry allowlist.
 2. Reconcile accepted RFC 0011 decisions with the still-draft RFC 0010 and
    confirm the exact host-index fields and recovery authority boundary.
 3. If separately authorized, add synthetic fixture tests for the table above in
@@ -371,19 +398,25 @@ reconciliation must establish the prior call outcome before further work.
 2. **Accept host-only identity and dispatch marker:** one opaque `job_id` and
    confirmed append-only `dispatch-started` entry, coordinated with RFC 0010.
    A marker that may exist blocks redelivery until the reader reconciles it.
-3. **Accept clock and budget recovery:** same stable monotonic epoch and original
+3. **Accept read-only restart by default:** require explicit one-job,
+   one-transition caller/owner authorization before any restart-driven write,
+   dispatch, cancellation signal, or result advancement. Authorization does not
+   override expired deadlines, unknown clock epochs, changed revisions,
+   ambiguous dispatch, or unresolved writes. Read-only inspection remains
+   available without it.
+4. **Accept clock and budget recovery:** same stable monotonic epoch and original
    admission deadline only; no reset. An unavailable/different epoch blocks
    new calls and retries while allowing read-only reconciliation.
-4. **Accept the conservative retry allowlist:** at most one explicit retry, only
+5. **Accept the conservative retry allowlist:** at most one explicit retry, only
    after a terminal/reconciled `rate-limit` result proves no output or ambiguous
    action, with finite `retry_after_ms`, unchanged production bytes, and
    positive remaining job/time/material budgets. All other outcomes remain
    ineligible in this bounded version.
-5. **Accept cancellation as a request, not outcome rewriting:** before dispatch
+6. **Accept cancellation as a request, not outcome rewriting:** before dispatch
    it prevents the call; during a call it signals cancellation once and
    preserves the actual normalized result; during persistence it requires
    reconciliation. Use only RFC 0010's proposed existing Manifest mappings.
-6. **Preserve RFC 0010 timeout and integrity deferrals:** a timed-out outcome
+7. **Preserve RFC 0010 timeout and integrity deferrals:** a timed-out outcome
    remains protected and `contract-mapping-blocked`; uncertain writes remain
    nonterminal. No invented Manifest status/diagnostic, automatic finalization,
    or blind side-effect retry is authorized.
