@@ -84,13 +84,14 @@ result object has been constructed in memory.
 | State | Event | Required record/effect | Rejection condition |
 |---|---|---|---|
 | No attempt | Prepare | Allocate fresh `attempt_id` and `execution_id`; bind both to the exact production reference and record `retry_of_attempt_id: null` for a first attempt. Append and confirm this `prepared` entry before any execution side effect. | Missing/mismatched production identity; reused ID; protected index unavailable; execution begins before preparation is confirmed. |
-| Prepared | Execute once | Invoke one Provider Execution request using the recorded `execution_id`; do not replace a caller-supplied `correlation_id` with the `attempt_id`. Retain the normalized outcome as its Provider Execution result. | A second execution call under this attempt; hidden adapter retry; correlation value rewritten to imply attempt identity. |
-| Executing | Successful outcome and build-result verification | Construct one candidate `comic-build-result` with a distinct `result_id`, the same `attempt_id` and exact production reference. Preserve actual inputs, ordered transformations, verified outputs, status `complete`, and no diagnostics. This is `result-prepared`, not terminal. | Missing/mismatched required input, transformation, or output identity; an unverified output treated as successful. |
-| Executing | Normalized failure or cancellation | Prepare a candidate result using existing status/diagnostic fields; transition to `result-prepared`. Proposed mapping: use `partial` only when verified outputs are retained; otherwise use `failed`. Use an applicable existing diagnostic, including `CANCELLED` for cancellation. Neither result is release-eligible. This remains nonterminal until persisted and confirmed. | Claiming `complete` with diagnostics or incomplete/unverified outputs; inventing a diagnostic or emitting unsafe diagnostic content. |
-| Executing | Provider result is `timed-out` | Preserve the observed outcome in the Provider Execution record; transition to `contract-mapping-blocked`. Do not create a Comic Manifest result until a versioned mapping is approved. | Coercing timeout to `failed`/`partial`, inventing a timeout diagnostic, or reporting the build attempt terminal. |
+| Prepared | Execute once | Invoke exactly one Provider Execution request using the recorded `execution_id`; do not replace a caller-supplied `correlation_id` with the `attempt_id`. Wait for its single normalized result; the host state is `executing` until that result is durably recorded. | A second execution call under this attempt; hidden adapter retry; correlation value rewritten to imply attempt identity. |
+| Executing | Record the returned outcome | Append and confirm a protected immutable `provider-outcome` record containing the exact normalized result and canonical byte size/digest, keyed by `execution_id`, before discarding the returned outcome or interpreting it for a Comic Manifest result. | Proceeding without a confirmed outcome record; losing the outcome before its protected record is confirmed. |
+| Outcome-recorded | Successful outcome and build-result verification | Construct one candidate `comic-build-result` with a distinct `result_id`, the same `attempt_id` and exact production reference. Preserve actual inputs, ordered transformations, verified outputs, status `complete`, and no diagnostics. This is `result-prepared`, not terminal. | Missing/mismatched required input, transformation, or output identity; an unverified output treated as successful. |
+| Outcome-recorded | Normalized failure or cancellation | Prepare a candidate result using existing status/diagnostic fields; transition to `result-prepared`. Proposed mapping: use `partial` only when verified outputs are retained; otherwise use `failed`. Use an applicable existing diagnostic, including `CANCELLED` for cancellation. Neither result is release-eligible. This remains nonterminal until persisted and confirmed. | Claiming `complete` with diagnostics or incomplete/unverified outputs; inventing a diagnostic or emitting unsafe diagnostic content. |
+| Outcome-recorded | Provider result is `timed-out` | Append and confirm a `contract-mapping-blocked` entry keyed by `attempt_id` and `execution_id` that references the confirmed protected outcome record and exact production revision. Do not create a Comic Manifest result, retry, or auto-finalize. | Coercing timeout to `failed`/`partial`; inventing a timeout diagnostic; reporting the build attempt terminal. |
 | Result-prepared | Begin terminal persistence | Freeze the candidate bytes, `result_id`, byte size, and digest. Append a `persisting` index entry for those exact bytes before submitting one immutable result write. | Changing candidate bytes/ID after `persisting`; submitting a second terminal write or changing IDs to bypass a conflict. |
 | Persisting | Immutable result and terminal link are confirmed | Verify the stored bytes against the frozen size/digest, then append and confirm one terminal index entry referring to that exact result. Only after both confirmations is the attempt `terminal`. | Missing/ambiguous commit, byte mismatch, or unconfirmed terminal link; reporting terminal before both confirmations. |
-| Result-prepared or Persisting | Append of the `persisting` entry, immutable write/readback, or terminal-link append fails or is ambiguous | Mark the host state `reconciliation-required`; keep it nonterminal. Do not re-execute, retry the write, overwrite bytes, create another result ID, or start a retry until reconciliation has established the exact durable state. Recovery mechanics remain outside this RFC. | Treating failure/timeout/ambiguous response as proof of absence or success; silently repeating any side effect. |
+| Any nonterminal state | Any required protected-index append, immutable result write/readback, or terminal-link append fails or is ambiguous | Mark the host state `reconciliation-required`; keep it nonterminal. Do not re-execute, retry a write, overwrite bytes, create another result ID, start a retry, or finalize while unresolved. Reconcile by the identifiers/digest allocated or recorded at the affected step: use `attempt_id`/`execution_id` before a result exists, then include `result_id` and its digest once allocated. Apply the same rule to an uncertain `prepared`, `provider-outcome`, `contract-mapping-blocked`, `persisting`, or `terminal` append. | Treating failure/timeout/ambiguous response as proof of absence or success; silently repeating any side effect. |
 | Terminal attempt | Caller authorizes a retry | Allocate new attempt, execution, and result IDs. Set `retry_of_attempt_id` to the prior attempt ID and retain the exact same production reference. Preserve all prior entries and result bytes unchanged. Eligibility and retry limits belong to O03/caller policy. | Hidden or automatic retry; retrying a nonterminal or unreconciled attempt; changed production reference; overwriting a prior attempt/result. |
 | Any attempt | Production revision changes | Start a fresh lineage with a new attempt ID and no retry link. A changed exact production reference is not a retry. | Carrying a prior result, output, or approval to the new revision. |
 
@@ -109,6 +110,13 @@ The proposed index records these lifecycle references:
 
 - A `prepared` entry: `attempt_id`, the exact `production` reference, nullable
   `retry_of_attempt_id`, and the one allocated `execution_id`.
+- A `provider-outcome` entry: `execution_id`, the exact normalized Provider
+  Execution v1 result bytes, and verified canonical JSON byte size/digest. Keep
+  this record at the result's effective protected classification.
+- A `contract-mapping-blocked` entry: `attempt_id`, `execution_id`, the exact
+  production reference, and a protected reference to the matching
+  `provider-outcome` entry. This records a host lifecycle state, not a new
+  Provider Execution or Comic Manifest status.
 - A `persisting` entry: the same `attempt_id`, result status, `result_id`, and
   frozen result byte size/digest before the immutable write.
 - A `terminal` entry: the same `attempt_id`, `result_id`, and protected immutable
@@ -120,8 +128,15 @@ entries, and the prior attempt's entries are never changed when a retry begins.
 An attempt with a `persisting` entry but no confirmed `terminal` entry is
 nonterminal; any failed or ambiguous lifecycle append/write requires
 reconciliation before proceeding, including an uncertain `prepared` append.
-This describes identity and linkage only; it does not prescribe a database,
-queue, storage API, retention period or runtime interface.
+For `timed-out`, the protected `provider-outcome` record makes the normalized
+error recoverable by `execution_id`; the `contract-mapping-blocked` entry keeps
+the attempt and exact production revision linked to it. An authorized
+reconciliation can retrieve and verify these records, but this draft defines no
+automatic finalization or retry. If the outcome cannot be recovered by
+`execution_id`, the attempt remains unresolved and this version provides no
+safe way to reconstruct it. This describes identity and linkage only; it does
+not prescribe a database, queue, storage API, retention period or runtime
+interface.
 
 Storage integrity metadata is not a new field in `comic-build-result`. This draft
 recommends reusing Studio canonical JSON v1 byte-size/SHA-256 semantics from
@@ -146,11 +161,13 @@ Provider Execution v1 can return `timed-out`. The current Comic Manifest schema
 has no timeout diagnostic (its diagnostics are a closed enum) and no matching
 build-result status. This draft therefore does not map a timed-out execution to
 `failed` or `partial`, and does not invent a `TIMEOUT` diagnostic or add a
-schema field. If the one mock call returns `timed-out`, retain that observed
-outcome in the Provider Execution record, leave the build attempt nonterminal,
-and do not create a terminal `comic-build-result` until the contract owner
-approves a versioned mapping. This is a deliberate deferral, not a pass or a
-release disposition.
+schema field. If the one mock call returns `timed-out`, persist its exact
+normalized Provider Execution result in the protected `provider-outcome` index
+entry and record the `contract-mapping-blocked` state described above. The build
+attempt remains nonterminal with no Comic Manifest result until the contract
+owner approves a versioned mapping and an explicitly authorized reconciliation
+applies it. No automatic finalization or retry occurs. This is a deliberate
+deferral, not a pass or a release disposition.
 
 ### Finite fixture expectations
 
@@ -162,14 +179,15 @@ authorization. All use synthetic data from the existing Comic Manifest fixture.
 | First successful attempt | One exact production reference and one mock execution | New attempt/result IDs; result binds the same exact revision; actual input identities, ordered transformation digests and verified output identities are preserved; terminal `complete` is stored immutably. |
 | One-call identity and caller correlation | One request has a caller-supplied `correlation_id` | The prepared index associates exactly one distinct `execution_id` with the `attempt_id`; the request's caller-supplied correlation value is not overwritten with the `attempt_id` and follows Provider Execution v1 semantics. A second provider call under this attempt is rejected; multi-call association is deferred. |
 | Retry after terminal failure | A prior failed result and explicit caller retry authorization | New attempt/result IDs; retry link to the prior attempt; same exact production reference; prior result bytes and status remain unchanged. Retry eligibility itself is not decided here. |
-| Failure without usable output | Mock execution returns a normalized failure | Terminal `failed` result with an applicable existing safe diagnostic; no successful output or release claim. |
+| Failure without usable output | An otherwise schema-valid mock Provider Execution result for the prepared `execution_id`: `status=failed`, `finish_reason=error`, `error.category=output-validation`, `error.code=OUTPUT_SCHEMA_INVALID`, `error.message="Mock output failed the declared output schema."`, `error.retryable=false`, `error.stage=output-validation`, no output | Build result uses existing `status=failed`, `outputs=[]`, and `diagnostics=[VALIDATION_FAILED]`; no successful output or release claim. The existing Provider Execution [error taxonomy](../specs/execution-contracts/provider-execution-v1.md#normalized-error-taxonomy) defines `output-validation`; the existing [Comic Manifest schema](../schemas/json/comic-manifest/v1/comic-manifest.schema.json) defines `VALIDATION_FAILED`. |
 | Cancellation with retained verified output | Cancellation after a fixture output is independently verified | Terminal `partial` result with `CANCELLED`; only the verified output is retained; result cannot support release. |
 | Cancellation before usable output | Cancellation before any output is verified | Terminal `failed` result with `CANCELLED`; no output is represented as successful. |
-| Provider execution timeout | The one mock Provider Execution returns `timed-out` | Preserve that observed outcome; do not invent `TIMEOUT`, map to `failed`/`partial`, or emit a terminal Comic Manifest result. Mark the attempt `contract-mapping-blocked` and keep it nonterminal pending an owner-approved versioned mapping. |
+| Provider execution timeout | An otherwise schema-valid mock Provider Execution result for the prepared `execution_id`: `status=timed-out`, `finish_reason=error`, `error.category=timeout`, `error.code=MOCK_TIMEOUT`, `error.message="Mock adapter deadline expired."`, `error.retryable=false`, `error.stage=adapter`, no output | Append exact normalized result bytes and verified canonical JSON v1 byte size/SHA-256 to protected `provider-outcome` keyed by `execution_id`; append `contract-mapping-blocked` keyed by `attempt_id`/`execution_id`. Emit no Comic Manifest result; do not invent `TIMEOUT`, coerce a status, retry, or auto-finalize. |
 | Revision mismatch on retry | Retry entry points to a different production identity/revision | Reject as a retry before execution; require a fresh lineage for the changed revision. |
 | Replay or overwrite | A second terminal write is submitted for a completed attempt, or existing attempt/result IDs are submitted with different bytes | Reject, including byte-identical replay writes; preserve the original immutable bytes and lineage. An identical read returns the stored result without mutation. |
 | Storage-integrity failure | Stored bytes do not match recorded size/digest or protected storage is unavailable | Do not report a terminal success; fail closed without exposing paths or protected identifiers. |
-| Ambiguous terminal write | The immutable result write or terminal index append returns an ambiguous outcome | Keep the attempt nonterminal and require reconciliation by the fixed attempt/result IDs and candidate digest; do not execute again, submit a second write, or start a retry while unresolved. |
+| Preparation acknowledgment failure | The `prepared` index append fails or has an ambiguous response | No Provider Execution call occurs. Keep the attempt nonterminal and reconcile by fixed `attempt_id`/`execution_id`; do not execute until exactly one `prepared` entry is confirmed. |
+| Ambiguous persistence matrix | After a confirmed `prepared` entry and exactly one mock call, inject failure/ambiguity at each point: `provider-outcome` append; `contract-mapping-blocked` append; `persisting` index append; immutable result write; terminal index append after verified readback | Before the outcome append is confirmed, do not discard the returned result or issue another call; reconcile by `execution_id`, remaining unresolved if exact outcome bytes cannot be recovered. A blocked-entry failure leaves the outcome recoverable but the attempt `reconciliation-required`. `persisting` append failure: no result write is submitted. Result-write failure: fixed candidate ID/digest and confirmed `persisting` entry remain; no terminal link is claimed. Terminal-link failure: the verified immutable result remains untouched. At every point keep the attempt nonterminal/reconciliation-required; do not repeat execution or writes, overwrite bytes, allocate substitute IDs, start a retry, or finalize while unresolved. |
 
 ## Compatibility and migration
 
@@ -231,19 +249,33 @@ separate owners and future approved scopes.
    No code, schema, runtime test, storage service, release, or production change
    is included in this draft.
 
-## Unresolved questions
+## Owner decisions (proposed dispositions)
 
-1. Does the owner accept the protected append-only index for retry lineage and
-   the one-call `execution_id` association, preserving caller `correlation_id`?
-2. Does the proposed `partial`/`failed` plus `CANCELLED` mapping match the
-   intended cancellation semantics?
-3. Does the owner accept terminal status only after immutable result bytes are
-   verified and the terminal index link is confirmed, with failed/ambiguous
-   writes held nonterminal for explicit reconciliation?
-4. Does the owner accept canonical JSON v1 byte-size/SHA-256 metadata as the
-   protected result-envelope integrity check?
-5. Does the owner agree that a Provider Execution `timed-out` outcome remains
-   unmapped and nonterminal until a versioned Comic Manifest contract decision?
-6. Which O03 rules determine whether a terminal failed or cancelled attempt may
-   be retried? A nonterminal or unreconciled attempt is not retryable under this
-   draft.
+1. **Accept the protected append-only host index for this bounded path.** Store
+   `prepared`, `provider-outcome`, `contract-mapping-blocked`, `persisting`, and
+   `terminal` records with exact attempt/execution/result linkage. Each attempt
+   has one Provider Execution call. Preserve caller `correlation_id` unchanged;
+   defer multi-call attempts to a later design. This keeps host lifecycle data
+   out of the closed Comic Manifest schema while retaining the exact protected
+   Provider Execution outcome and blocked state by `execution_id`.
+2. **Accept the persistence boundary and integrity checks.** Use canonical JSON
+   v1 byte size and SHA-256 for protected Provider Execution outcomes and stored
+   Comic Manifest result envelopes. Append `persisting` before one immutable
+   result write, verify readback, then confirm the terminal index link. Keep any
+   failed or ambiguous append/write nonterminal for explicit reconciliation;
+   do not overwrite, silently repeat, execute again, retry, or auto-finalize.
+   The precise store implementation and read-consistency guarantees remain
+   separately designed.
+3. **Accept explicit existing-diagnostic mappings.** For cancellation, use
+   `partial` plus `CANCELLED` only when verified outputs are retained; otherwise
+   use `failed` plus `CANCELLED`. For the finite normalized output-validation
+   failure fixture, use `failed` plus `VALIDATION_FAILED`, with no Manifest
+   output. These mappings add no diagnostic enum or result status.
+4. **Accept the timeout deferral.** Preserve the exact `timed-out` Provider
+   Execution result in the protected index and mark the attempt
+   `contract-mapping-blocked`; emit no Comic Manifest terminal result until a
+   versioned mapping is approved and explicitly reconciled. Do not infer a
+   `TIMEOUT` diagnostic or automatically finalize/retry.
+5. **Leave retry eligibility with O03/caller policy.** Only a terminal,
+   reconciled attempt may be considered for a separately authorized retry. This
+   RFC defines no retry budget or eligibility rule.
