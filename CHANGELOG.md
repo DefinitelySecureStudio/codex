@@ -11,11 +11,12 @@ compatible, or editorial.
 
 ## Unreleased
 
-- Propose stable record IDs 0.1.0 in Draft RFC 0009 (new additive family),
-  built on RFC 9562 UUIDv4 with standard hyphenated lowercase suffixes, pinpoint
-  standards references, and synthetic syntax/version/variant and inventory/reference
-  conformance evidence. Prefix and identity lifecycle rules remain application policy. No
-  existing or released contract semantics change; adoption remains undecided.
+- Accept stable record IDs 0.1.0 in RFC 0009 as a new additive application
+  profile, built on RFC 9562 UUIDv4 with standard hyphenated lowercase suffixes,
+  pinpoint standards references, and synthetic syntax/version/variant and
+  inventory/reference conformance evidence. Andrew owns the restricted,
+  version-controlled inventory and reviewed allocation process. The profile is
+  unreleased; existing released contract semantics remain unchanged.
 
 - Clarified the unreleased Comic Manifest 1.0.0 candidate's (#95 prerequisite)
   detached approval time bounds: decision time is inclusive, expiry is exclusive
