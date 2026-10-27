@@ -90,7 +90,7 @@ result object has been constructed in memory.
 | Executing | Provider result is `timed-out` | Preserve the observed outcome in the Provider Execution record; transition to `contract-mapping-blocked`. Do not create a Comic Manifest result until a versioned mapping is approved. | Coercing timeout to `failed`/`partial`, inventing a timeout diagnostic, or reporting the build attempt terminal. |
 | Result-prepared | Begin terminal persistence | Freeze the candidate bytes, `result_id`, byte size, and digest. Append a `persisting` index entry for those exact bytes before submitting one immutable result write. | Changing candidate bytes/ID after `persisting`; submitting a second terminal write or changing IDs to bypass a conflict. |
 | Persisting | Immutable result and terminal link are confirmed | Verify the stored bytes against the frozen size/digest, then append and confirm one terminal index entry referring to that exact result. Only after both confirmations is the attempt `terminal`. | Missing/ambiguous commit, byte mismatch, or unconfirmed terminal link; reporting terminal before both confirmations. |
-| Persisting | Append of the `persisting` entry, immutable write/readback, or terminal-link append fails or is ambiguous | Mark the host state `reconciliation-required`; keep it nonterminal. Do not re-execute, retry the write, overwrite bytes, create another result ID, or start a retry until reconciliation has established the exact durable state. Recovery mechanics remain outside this RFC. | Treating failure/timeout/ambiguous response as proof of absence or success; silently repeating any side effect. |
+| Result-prepared or Persisting | Append of the `persisting` entry, immutable write/readback, or terminal-link append fails or is ambiguous | Mark the host state `reconciliation-required`; keep it nonterminal. Do not re-execute, retry the write, overwrite bytes, create another result ID, or start a retry until reconciliation has established the exact durable state. Recovery mechanics remain outside this RFC. | Treating failure/timeout/ambiguous response as proof of absence or success; silently repeating any side effect. |
 | Terminal attempt | Caller authorizes a retry | Allocate new attempt, execution, and result IDs. Set `retry_of_attempt_id` to the prior attempt ID and retain the exact same production reference. Preserve all prior entries and result bytes unchanged. Eligibility and retry limits belong to O03/caller policy. | Hidden or automatic retry; retrying a nonterminal or unreconciled attempt; changed production reference; overwriting a prior attempt/result. |
 | Any attempt | Production revision changes | Start a fresh lineage with a new attempt ID and no retry link. A changed exact production reference is not a retry. | Carrying a prior result, output, or approval to the new revision. |
 
@@ -118,7 +118,8 @@ The proposed index records these lifecycle references:
 Entries are append-only. A terminal entry does not update or replace earlier
 entries, and the prior attempt's entries are never changed when a retry begins.
 An attempt with a `persisting` entry but no confirmed `terminal` entry is
-nonterminal; after any failed or ambiguous operation it requires reconciliation.
+nonterminal; any failed or ambiguous lifecycle append/write requires
+reconciliation before proceeding, including an uncertain `prepared` append.
 This describes identity and linkage only; it does not prescribe a database,
 queue, storage API, retention period or runtime interface.
 
