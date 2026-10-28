@@ -23,11 +23,13 @@ deadline, bounded resource use, an explicit one-retry ceiling, and fail-closed
 resume behavior. Candidate numeric limits are recommendations for owner review,
 not requirements inherited from an existing contract.
 
-This proposal builds on the lifecycle design in [draft RFC 0010 at its exact
-reviewed head](https://github.com/DefinitelySecureStudio/codex/blob/0de9e55dafe513c4178f0de8840a9df773bb3d08/rfcs/0010-build-attempt-lifecycle.md).
-RFC 0010 is still a draft; this link records design input, not contract
-acceptance. Neither RFC changes a schema or authorizes runtime, release, or
-production work.
+This proposal builds on [RFC 0010](0010-build-attempt-lifecycle.md), which was
+merged to `main` at [952518820f8f7984414acbedba9dcc8d7082f394](https://github.com/DefinitelySecureStudio/codex/commit/952518820f8f7984414acbedba9dcc8d7082f394)
+but remains **Draft; contract-owner decision pending**. The merge records the
+proposal; it does not adopt the contract. O03's retry, cancellation, and recovery
+rules must be reviewed against this merged Draft before any coordinated
+normative adoption. Neither RFC changes a schema or authorizes runtime,
+release, or production work.
 
 ## Motivation and boundaries
 
@@ -268,8 +270,8 @@ existing IDs, and absence of conflicting allocations. An absent ID may be
 allocated once only for the authorized next transition; an uncertain ID is
 never replaced. The authorization MUST NOT reset the deadline or budgets,
 change the revision, override an expired deadline or ambiguous side effect, or
-bypass `contract-mapping-blocked`. It permits at most the specific previously
-prepared transition listed below; it is not a new job or retry authorization.
+bypass `contract-mapping-blocked`. It permits at most one enumerated next
+transition below; it is not a new job or retry authorization.
 The original deadline MUST still be unexpired for restart-driven preparation,
 dispatch, outcome advancement, or terminal linking. After expiry, only reads
 and an explicitly requested cancellation-only marker/signal are permitted.
@@ -382,8 +384,10 @@ reconciliation must establish the prior call outcome before further work.
 1. Record the contract owner's decisions on the proposed numeric limits,
    `job_id`/`dispatch-started` host index, restart authorization, clock-epoch
    behavior, cancellation mapping, and retry allowlist.
-2. Reconcile accepted RFC 0011 decisions with the still-draft RFC 0010 and
-   confirm the exact host-index fields and recovery authority boundary.
+2. Reconcile any O03 decisions the owner accepts with merged Draft RFC 0010 and
+   confirm the host-index fields and recovery authority boundary before
+   coordinated normative adoption. RFC 0010's merge alone does not constitute
+   acceptance.
 3. If separately authorized, add synthetic fixture tests for the table above in
    the appropriate implementation repository. No schema, runtime, storage,
    real-provider, release, or production work is included here.
