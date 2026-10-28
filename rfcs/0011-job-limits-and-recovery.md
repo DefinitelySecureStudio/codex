@@ -1,6 +1,6 @@
 # RFC 0011: Job limits and recovery semantics
 
-- Status: Draft; contract-owner decision pending
+- Status: Draft; synthetic-only prototype scope approved; normative contract decision pending
 - Authors: Codex draft for Studio O03
 - Created: 2026-10-27
 - Contract family: bounded orchestration over Comic Manifest and Provider Execution
@@ -21,15 +21,20 @@ recovery rules for one synthetic Comic Manifest production revision and one
 offline mock Provider Execution call per attempt. It defines a nonresettable job
 deadline, bounded resource use, an explicit one-retry ceiling, and fail-closed
 resume behavior. Candidate numeric limits are recommendations for owner review,
-not requirements inherited from an existing contract.
+not requirements inherited from an existing contract. The owner approved these
+candidate limits and the reviewed conservative behavior below for a bounded,
+synthetic-only prototype on 2026-10-28; that decision does not accept this RFC
+as a normative contract.
 
 This proposal builds on [RFC 0010](0010-build-attempt-lifecycle.md), which was
 merged to `main` at [952518820f8f7984414acbedba9dcc8d7082f394](https://github.com/DefinitelySecureStudio/codex/commit/952518820f8f7984414acbedba9dcc8d7082f394)
 but remains **Draft; contract-owner decision pending**. The merge records the
 proposal; it does not adopt the contract. O03's retry, cancellation, and recovery
 rules must be reviewed against this merged Draft before any coordinated
-normative adoption. Neither RFC changes a schema or authorizes runtime,
-release, or production work.
+normative adoption. Neither RFC changes a schema, and merging either RFC is not
+implementation authorization. The separate prototype-scope approval recorded
+below authorizes only the bounded synthetic prototype; it does not authorize
+release or production work.
 
 ## Motivation and boundaries
 
@@ -381,49 +386,80 @@ reconciliation must establish the prior call outcome before further work.
 
 ## Implementation plan
 
-1. Record the contract owner's decisions on the proposed numeric limits,
-   `job_id`/`dispatch-started` host index, restart authorization, clock-epoch
-   behavior, cancellation mapping, and retry allowlist.
-2. Reconcile any O03 decisions the owner accepts with merged Draft RFC 0010 and
-   confirm the host-index fields and recovery authority boundary before
-   coordinated normative adoption. RFC 0010's merge alone does not constitute
-   acceptance.
-3. If separately authorized, add synthetic fixture tests for the table above in
-   the appropriate implementation repository. No schema, runtime, storage,
-   real-provider, release, or production work is included here.
+1. The contract owner approved the bounded synthetic-only prototype scope and
+   choices recorded below on 2026-10-28.
+2. Coordinate the prototype's host index with merged Draft RFC 0010, preserving
+   its distinct attempt, execution, and result identities and its prepared,
+   persisting, and terminal verification boundaries. RFC 0010's merge alone
+   does not constitute normative acceptance.
+3. Implement the separately approved prototype in Platform with synthetic
+   fixtures and a mock provider. This RFC remains a design record and adds no
+   schema or released contract. Runtime and storage implementation are separate;
+   this approval does not authorize real providers, release, or production.
 
-## Owner decisions (proposed dispositions)
+## Owner decision record
 
-1. **Adopt the candidate finite limits or provide replacements:** one active
-   job/no queue, two attempts total, one provider call per attempt, 300,000 ms
-   job execution budget, and 128 MiB aggregate material. These values are
-   stricter host policy over existing per-document/profile limits; they do not
-   change Provider Execution `timeout_ms`.
-2. **Accept host-only identity and dispatch marker:** one opaque `job_id` and
-   confirmed append-only `dispatch-started` entry, coordinated with RFC 0010.
-   A marker that may exist blocks redelivery until the reader reconciles it.
-3. **Accept read-only restart by default:** require explicit one-job,
-   one-transition caller/owner authorization before any restart-driven write,
-   dispatch, cancellation signal, or result advancement. Authorization does not
-   override expired deadlines, unknown clock epochs, changed revisions,
-   ambiguous dispatch, or unresolved writes. Read-only inspection remains
-   available without it.
-4. **Accept clock and budget recovery:** same stable monotonic epoch and original
-   admission deadline only; no reset. An unavailable/different epoch blocks
-   new calls and retries while allowing read-only reconciliation.
-5. **Accept the conservative retry allowlist:** at most one explicit retry, only
-   after a terminal/reconciled `rate-limit` result proves no output or ambiguous
-   action, with finite `retry_after_ms`, unchanged production bytes, and
-   positive remaining job/time/material budgets. All other outcomes remain
-   ineligible in this bounded version.
-6. **Accept cancellation as a request, not outcome rewriting:** before dispatch
-   it prevents the call; during a call it signals cancellation once and
-   preserves the actual normalized result; during persistence it requires
-   reconciliation. Use only RFC 0010's proposed existing Manifest mappings.
-7. **Preserve RFC 0010 timeout and integrity deferrals:** a timed-out outcome
-   remains protected and `contract-mapping-blocked`; uncertain writes remain
-   nonterminal. No invented Manifest status/diagnostic, automatic finalization,
-   or blind side-effect retry is authorized.
+On 2026-10-28, the owner approved the following choices for one bounded,
+offline prototype using a synthetic Comic Manifest revision, one mock Provider
+Execution call per attempt, and tests. They are accepted as prototype host
+policy only, not as normative contract requirements:
 
-These are design decisions only. Until the contract owner records acceptance,
-this RFC remains non-normative and no implementation or production use follows.
+1. **Finite limits:** one active admitted job with no queue; two total attempts
+   per job (one initial attempt and at most one explicit retry); one provider
+   call per attempt; a 300,000 ms (five-minute) monotonic job budget from
+   admission; an 8 MiB rendered-prompt cap per attempt or the lower exact
+   descriptor `max_input_bytes`; 16 MiB UTF-8 normalized Provider Execution
+   output content per call; 64 MiB total generated artifacts per job; 128 MiB
+   aggregate job material; at most 32 lifecycle metadata entries, 32 KiB per
+   entry, and 1 MiB reserved for that metadata within the aggregate ceiling.
+   Keep the existing Manifest parse limits (8 MiB document, depth 32, 100,000
+   JSON values, and 32,768 UTF-8 bytes per string), and never exceed an
+   individual artifact's existing production `max_bytes` or profile cap.
+   These limits do not change Provider Execution `timeout_ms`.
+2. **Host identity and dispatch:** use an opaque `job_id` and confirmed,
+   append-only `dispatch-started` host-index marker, coordinated with RFC 0010's
+   distinct attempt, execution, and result identities. A marker that may exist
+   blocks redelivery until its state is reconciled. This is prototype index
+   state, not a schema addition.
+3. **Restart and clock:** restart recovery is read-only by default. Any
+   restart-driven mutation requires explicit authorization for one job and one
+   enumerated next transition, using existing IDs, the pinned revision, original
+   monotonic clock epoch and deadline, and persisted budgets. Authorization
+   cannot override an expired deadline, unknown clock epoch, changed revision,
+   ambiguous dispatch, or unresolved write. Never reset the deadline or infer
+   that an uncertain side effect did not occur. A post-restart cancellation-only
+   request may signal only a verified existing execution ID; it cannot authorize
+   dispatch or result advancement. Read-only inspection remains available
+   without authorization.
+4. **Retry:** at most one explicit caller-authorized retry, only after a
+   terminal, fully reconciled `rate-limit` outcome with `retryable: true`,
+   finite `retry_after_ms`, and safe provider details that positively establish
+   rejection before acceptance/action and no output. The caller must wait at
+   least that delay and explicitly authorize the retry; the same production
+   bytes and positive time/material budgets must still verify. Give the new
+   attempt fresh IDs and preserve prior records. Do not automatically retry;
+   timeout, cancellation, changed revision, exhausted limits, or unresolved
+   call/write is ineligible.
+5. **Cancellation:** before dispatch, cancellation prevents the call; during a
+   call, signal cancellation once and preserve the actual normalized provider
+   outcome; after a successful response, do not relabel success; after an
+   outcome is recorded, stop future attempts but preserve that outcome; during
+   persistence, preserve fixed IDs and reconcile without overwrite or replay.
+   Cancellation before admission creates no job or attempt IDs. Use only the
+   existing proposed RFC 0010 mappings; cancellation is not a new Comic
+   Manifest status, and cancellation after terminal confirmation does not alter
+   the immutable result.
+
+This prototype decision does not accept RFC 0010 or RFC 0011 as normative,
+change any existing schema, authorize real providers, production execution,
+release, or stable adoption, or decide deferred timeout and result-integrity
+semantics. A timed-out outcome remains `contract-mapping-blocked` under the
+current draft; ambiguous dispatch or persistence remains nonterminal and
+requires read-only reconciliation. Do not invent a Manifest status or
+diagnostic, automatically finalize an uncertain write, or retry a possibly
+performed side effect. Any normative adoption or change to these deferred
+semantics requires a separate decision and coordinated review.
+
+The recorded approval is limited to the separately scoped synthetic prototype.
+This RFC remains non-normative, and the approval does not authorize production
+use or stable adoption.
