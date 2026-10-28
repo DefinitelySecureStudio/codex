@@ -30,6 +30,10 @@ v1 (RFC 0002), Context Package v1 (RFC 0003), Structured Output v1 (RFC 0004),
 and the unreleased UUIDv4 application profile 0.1.0 (RFC 0009). RFC 0009 has no
 released schema, consumer migration, or production integration yet.
 
-[Draft RFC 0010](0010-build-attempt-lifecycle.md) proposes bounded build-attempt
-and terminal-result lifecycle semantics for Studio O02. It is not accepted and
-does not change an existing schema or authorize runtime or production work.
+[RFC 0010 (merged; still Draft)](0010-build-attempt-lifecycle.md) proposes
+bounded build-attempt and terminal-result lifecycle semantics for Studio O02.
+Its merge did not accept the contract or authorize runtime or production work.
+
+[Draft RFC 0011](0011-job-limits-and-recovery.md) proposes finite job limits,
+cancellation, retry, and recovery semantics for Studio O03. It is not accepted
+and does not change an existing schema or authorize runtime or production work.
