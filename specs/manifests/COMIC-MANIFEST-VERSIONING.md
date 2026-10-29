@@ -1,48 +1,71 @@
 # Comic Manifest compatibility and release boundaries
 
-Comic Manifest 1.0.0 is a new additive **unreleased candidate family**. The three
-record kinds and detached approval definition travel together in one contract
-bundle. Their `spec_version` is independent of episode revisions, artifact logical
-versions and the Context Package/Builder/Prompt SDK contract versions.
+## Published 1.0.0 baseline
 
-RFC 0008 completes the rendition/publication portion of this same pre-release
-candidate. It adds required profile and output-cap fields before Comic Manifest
-1.0.0 is accepted or published. The earlier #89 candidate source and the #90–#93
-development consumers are not a released 1.0.0 contract; consumers must update to
-the Codex revision accepted for the candidate before using the expanded schema.
-The new profile references themselves use exact immutable ID/version pairs.
+Comic Manifest 1.0.0 is a published contract bundle. The Codex release
+[`contract/comic-manifest/v1.0.0`](https://github.com/DefinitelySecureStudio/codex/releases/tag/contract/comic-manifest/v1.0.0)
+is published and marked immutable at source commit
+[`12e437e30328a3bb9cd2d15e6307a70b4b7e0e2a`](https://github.com/DefinitelySecureStudio/codex/commit/12e437e30328a3bb9cd2d15e6307a70b4b7e0e2a).
+It contains the closed schema, normative specification and fixture bundle for
+production, build-result, public-release and detached-approval records. Platform
+binds its v1.0.0 implementation to the same Codex tag, commit and schema asset.
 
-Consumers must advertise exact supported kind/version pairs; a 1.0.0 validator
-rejects 1.0.1/1.1.0 until explicitly supported. This is the RFC's intentional narrow
-capability rule, not a promise of implicit minor compatibility. Closed records
-cannot silently ignore new optional fields. New fields or changes to accepted
-meaning need coordinated review, a versioned schema ID and support negotiation;
-incompatible representations require a new major version under Codex policy.
+The Platform consumer release
+[`comic-manifest/v1.0.0`](https://github.com/DefinitelySecureStudio/platform/releases/tag/comic-manifest/v1.0.0)
+is also published and marked immutable. Its source is commit
+[`f0672d90a47473da6a27614cad07abc175546d67`](https://github.com/DefinitelySecureStudio/platform/commit/f0672d90a47473da6a27614cad07abc175546d67).
+The [publication proof](https://github.com/DefinitelySecureStudio/platform/blob/f66b755b797aa5d5b4dee5f7da9f6995c3e98f75/release/comic-manifest-v1.0.0-publication-proof.json)
+records fresh-download verification for its eight public release assets. The
+Platform contract binding identifies the Codex schema asset as 30,860 bytes with
+SHA-256 `7bd3c5392ae0db0c5baba553c233142d3d4427471f5850123eef7b87d4c8eaa4`.
 
-No released foundation changes or migrations are needed. Preserve the bytes of
-Prompt Definition, Provider Execution, Context Package, Structured Output,
-Execution Provenance and Context Builder, including their released artifacts.
-This work changes neither release catalogs nor existing release tags. Draft source
-pins used in tests are explicitly non-production and never replace a release lock.
+The 1.0.0 schema file, normative specification, bundle, and both releases are
+historical immutable artifacts. The schema's `title` and the versioned
+specification's header retain proposal-era “candidate” and “unreleased” wording
+from their published source; those strings are preserved release content, not
+the current publication status. RFC 0007 and RFC 0008 likewise retain their
+proposal-stage wording as historical RFC records. This versioning document
+records the later publication fact without changing those artifacts' lifecycle
+history or implying further authority.
 
-Before production use (#99): owner-accept RFC/spec/fixtures; complete Platform
-conformance and affected-consumer reviews; add a separate release catalog; package
-schema/spec/fixtures/license/notices; verify immutable release assets and record
-repository, version, tag, commit, URI, media type, byte size and SHA-256 in every
-consumer. Expected tag: `contract/comic-manifest/v1.0.0`. No tag, registry publication
-or production trust deployment is authorized by #89 or its merge.
+Studio issue [#99](https://github.com/DefinitelySecureStudio/studio/issues/99)
+closed complete after publication and consumer-handoff verification. That
+closeout records the exact artifacts; it does not itself authorize real-provider
+execution, production trust onboarding, private-source use, orchestration, canon
+promotion or creative publication. The Platform package remains private and was
+not published to npm.
 
-Known consumers: Platform #90–#98 and future Epic #7; Universe's owner-reviewed
-public release records; approved private production/provenance stores. Studio
-coordinates architecture, never supplies a runtime dependency. Record Codex owner
-and Platform feasibility/consumer review before adoption. Universe/source owners
-review publication and protected-evidence boundaries before real use.
+## Version and compatibility policy
 
-A future migration must preserve production/panel/episode identity, immutable
-history, classification, rights and exact evidence links; changed bytes get new
-candidate identities and applicable reviews. It must inventory consumers, document
-loss explicitly, provide side-by-side contracts/fixtures and a dated support window
-approved by owners before deprecation. No retirement or support window is started
-by this initial candidate. Old releases remain available; rollback selects an
-explicit supported immutable version and cannot restore revoked authority. No
-silent downgrade, lossy conversion or private-data disclosure is permitted.
+Consumers advertise exact supported kind/version pairs. A 1.0.0 validator
+rejects 1.0.1 or 1.1.0 until that exact version is explicitly supported. Closed
+records cannot silently ignore new fields. New fields or changes to accepted
+meaning require coordinated review, a versioned schema ID and support
+negotiation; incompatible representations require a new major version under
+Codex policy.
+
+The published 1.0.0 tag, schema asset, bundle, and Platform release must never be
+replaced or moved. A correction or expanded capability requires a separate
+reviewed version and immutable release; it must preserve exact-version
+negotiation. Existing records are not rewritten or silently upgraded.
+
+The additive rendition/profile proposal in RFC 0008 was part of the source that
+was ultimately published as Comic Manifest 1.0.0. References in RFC 0007 and
+RFC 0008 to an unreleased candidate describe their proposal-time context; this
+living document and the publication records above give the current artifact
+status.
+
+## Consumer and production boundaries
+
+Platform is the released v1.0.0 consumer. Universe public release records and
+approved private production/provenance stores remain subject to their own owner
+review and exact-version support. The schema and release package prove bytes and
+version identity; they do not establish rights, authority, safety, publication
+approval or production trust.
+
+Any future contract version must identify affected consumers, document
+compatibility and migration requirements, provide side-by-side fixtures, and
+include a reviewed rollback and support-window plan before deprecation. A new
+contract release does not start a support window or retire older immutable
+releases by itself. Rollback selects an explicitly supported immutable version
+and cannot restore revoked authority.

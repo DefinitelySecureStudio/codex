@@ -1,5 +1,14 @@
 # Comic Manifest v1 publication checklist — Studio #99
 
+> **Historical pre-publication checklist.** Publication and consumer handoff
+> completed; Studio [#99](https://github.com/DefinitelySecureStudio/studio/issues/99)
+> is closed. The Codex [immutable `contract/comic-manifest/v1.0.0` release](https://github.com/DefinitelySecureStudio/codex/releases/tag/contract/comic-manifest/v1.0.0)
+> and Platform [immutable `comic-manifest/v1.0.0` release](https://github.com/DefinitelySecureStudio/platform/releases/tag/comic-manifest/v1.0.0)
+> are the published artifacts. The steps and pending-status statements below
+> record the pre-publication review sequence as it stood at the time; they are
+> not current release instructions or permission. Do not replace or republish
+> the 1.0.0 artifacts. Further use or new release work remains separately gated.
+
 Owner: @andrewperis. This is release preparation only. It creates no tag,
 release, asset, npm publication, visibility change, security-policy change, or
 production permission. The candidate catalog contains only the additive

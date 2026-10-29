@@ -9,6 +9,13 @@ All notable contract changes will be documented here. Each entry must identify
 the affected contract and version and classify the change as breaking,
 compatible, or editorial.
 
+The Comic Manifest 1.0.0 bullets below record source development before
+publication. They use “candidate” and “unreleased” as historical descriptions;
+the Codex [`contract/comic-manifest/v1.0.0` release](https://github.com/DefinitelySecureStudio/codex/releases/tag/contract/comic-manifest/v1.0.0)
+and Platform [`comic-manifest/v1.0.0` release](https://github.com/DefinitelySecureStudio/platform/releases/tag/comic-manifest/v1.0.0)
+are now published and immutable. The historical entries do not supersede those
+release records or authorize further production use.
+
 ## Unreleased
 
 - Accept stable record IDs 0.1.0 in RFC 0009 as a new additive application

@@ -30,6 +30,16 @@ v1 (RFC 0002), Context Package v1 (RFC 0003), Structured Output v1 (RFC 0004),
 and the unreleased UUIDv4 application profile 0.1.0 (RFC 0009). RFC 0009 has no
 released schema, consumer migration, or production integration yet.
 
+## Published contract artifacts
+
+Comic Manifest 1.0.0 was published at the immutable Codex tag
+[`contract/comic-manifest/v1.0.0`](https://github.com/DefinitelySecureStudio/codex/releases/tag/contract/comic-manifest/v1.0.0)
+and consumed by the immutable Platform release
+[`comic-manifest/v1.0.0`](https://github.com/DefinitelySecureStudio/platform/releases/tag/comic-manifest/v1.0.0).
+Publication status is recorded separately from the proposal-stage wording in
+RFCs 0007 and 0008. These artifacts do not authorize additional production or
+publication work.
+
 [RFC 0010 (merged; still Draft)](0010-build-attempt-lifecycle.md) proposes
 bounded build-attempt and terminal-result lifecycle semantics for Studio O02.
 Its merge did not itself accept the contract or authorize runtime or production
@@ -42,3 +52,8 @@ Studio O03. The approval covers only a bounded offline prototype using
 synthetic inputs, a mock provider, and tests. It does not accept a normative
 contract, change an existing schema, authorize real-provider or production
 execution, or authorize release or stable adoption.
+
+[Draft RFC 0012](0012-no-output-failed-build-results.md) proposes a narrowly
+versioned representation for failed build attempts that produce no output. It
+does not change the published Comic Manifest 1.0.0 artifacts or authorize
+contract adoption or implementation.
