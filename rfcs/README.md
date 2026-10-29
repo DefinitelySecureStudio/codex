@@ -32,8 +32,13 @@ released schema, consumer migration, or production integration yet.
 
 [RFC 0010 (merged; still Draft)](0010-build-attempt-lifecycle.md) proposes
 bounded build-attempt and terminal-result lifecycle semantics for Studio O02.
-Its merge did not accept the contract or authorize runtime or production work.
+Its merge did not itself accept the contract or authorize runtime or production
+work. A separate owner decision permits only the bounded synthetic prototype
+described in RFC 0011; RFC 0010 remains a nonnormative Draft.
 
-[Draft RFC 0011](0011-job-limits-and-recovery.md) proposes finite job limits,
-cancellation, retry, and recovery semantics for Studio O03. It is not accepted
-and does not change an existing schema or authorize runtime or production work.
+[RFC 0011 (Draft; synthetic-only prototype scope approved)](0011-job-limits-and-recovery.md)
+proposes finite job limits, cancellation, retry, and recovery semantics for
+Studio O03. The approval covers only a bounded offline prototype using
+synthetic inputs, a mock provider, and tests. It does not accept a normative
+contract, change an existing schema, authorize real-provider or production
+execution, or authorize release or stable adoption.
