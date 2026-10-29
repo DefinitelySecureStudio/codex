@@ -91,8 +91,9 @@ into the Manifest result.
 | Confirmed outcome | Proposed Comic Manifest result | Retry effect |
 |---|---|---|
 | Rate limit that positively proves rejection before acceptance/action and no output | `failed`, `OUTPUT_MISSING`, no outputs, one truthful empty-output transformation | Eligible for consideration only after immutable result readback and terminal-link confirmation, with all RFC 0011 conditions and a separate explicit caller retry. |
-| Known validation failure before any output | `failed`, `VALIDATION_FAILED`, no outputs, if the selected version explicitly retains RFC 0010's existing mapping | Not retryable under RFC 0011. |
 | Normalized cancellation after dispatch, with confirmed no output | `failed`, `CANCELLED`, no outputs, only if the selected version retains RFC 0010's existing cancellation mapping | Never rate-limit eligible; no retry. Cancellation before dispatch produces no provider call and no Comic Manifest result. |
+| Output-validation failure where provider bytes exist and their digests are verified | Keep actual output digests in the transformation and use RFC 0010's existing `failed` + `VALIDATION_FAILED` mapping where applicable. This is not the no-output form even if no valid Manifest rendition is retained. | Not retryable under RFC 0011. |
+| Validation failure with missing normalized content or unknown provider-byte presence | Preserve the protected outcome; do not infer no bytes from an empty normalized output. Remain `contract-mapping-blocked` until a separate policy and evidence establish a valid mapping. | No retry. |
 | Failure where an output exists, has been produced, or its existence/integrity is uncertain | Do not use the no-output form. Apply an already supported mapping only when its actual evidence satisfies that mapping; otherwise preserve protected evidence and block for reconciliation. | Not eligible under the rate-limit rule. |
 | Provider Execution `timed-out`, ambiguous dispatch, or uncertain persistence | Keep the exact protected outcome and `contract-mapping-blocked` or reconciliation-required host state. Emit no Comic Manifest terminal result under this proposal. | No retry. Timeout and integrity mappings remain deferred. |
 
@@ -184,9 +185,11 @@ These are proposed expectations, not executed tests or claims of conformance.
    confirmation. After the delay and explicit caller authorization, one retry
    uses fresh IDs, links the old attempt, preserves the pinned production bytes
    and old records, and stays within original budgets.
-2. **Known no-output validation failure:** where RFC 0010's existing mapping is
-   retained, a known validation failure yields `failed` + `VALIDATION_FAILED`
-   with truthful empty output evidence and no retry eligibility.
+2. **Validation failure with actual provider bytes:** preserve verified digests
+   of those bytes in the transformation when using RFC 0010's existing
+   `failed` + `VALIDATION_FAILED` mapping. Do not mark the transformation as
+   empty-output. If normalized content is missing and provider-byte presence
+   cannot be established, remain blocked without a terminal result.
 3. **Cancellation:** pre-dispatch cancellation makes no call and emits no
    result. A dispatched mock that returns confirmed `cancelled` with no output
    can use `failed` + `CANCELLED` only when that existing mapping is in the
@@ -202,6 +205,11 @@ These are proposed expectations, not executed tests or claims of conformance.
   nonempty, if the transformation list is empty or has more than one step in
   this bounded path, or if the diagnostic is absent or outside the explicitly
   mapped allowlist.
+- Reject `VALIDATION_FAILED` with an empty transformation output-digest list
+  under this proposal. An empty normalized output is not proof that provider
+  bytes were absent. Preserve and digest any actual bytes when the existing
+  validation-failure mapping applies; otherwise block for a separate policy
+  and verified evidence.
 - Reject empty or fabricated input digests, nonempty output digests,
   `private_inputs_withheld: true`, or `private_outputs_withheld: true` for this
   form. Do not treat withheld or unknown output as no output.
@@ -256,9 +264,10 @@ retry delay, unchanged revision, or remaining budgets required by RFC 0011.
 
 1. Accept or reject a new versioned Comic Manifest representation for the
    narrowly defined no-output failure shape.
-2. Confirm whether the no-output `VALIDATION_FAILED` and `CANCELLED` mappings
-   from RFC 0010 are included in that version, or restrict it to
-   `OUTPUT_MISSING`.
+2. Confirm whether the existing no-output `CANCELLED` mapping is included in
+   that version, or restrict the new form to `OUTPUT_MISSING`. This proposal
+   excludes `VALIDATION_FAILED` with empty output digests; a future change would
+   need a separate policy that proves provider bytes were absent.
 3. After cross-consumer compatibility review, select a minor or major version
    and exact schema ID. The RFC recommends evaluating a minor version first
    only if the change is classified as additive; no version is selected here.
