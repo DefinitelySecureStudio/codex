@@ -31,10 +31,10 @@ contract or schema change.
 
 ## Motivation and existing-contract boundaries
 
-The current [Comic Manifest v1 candidate](../specs/manifests/comic-manifest-v1.md#renditions-and-build-results)
-already defines a `comic-build-result` with distinct `attempt_id` and `result_id`,
+The published [Comic Manifest v1.0.0 specification](../specs/manifests/comic-manifest-v1.md#renditions-and-build-results)
+defines a `comic-build-result` with distinct `attempt_id` and `result_id`,
 an exact production reference, actual inputs, status, outputs, execution
-transformations and diagnostics. The closed [candidate schema](../schemas/json/comic-manifest/v1/comic-manifest.schema.json)
+transformations and diagnostics. The closed [released schema](../schemas/json/comic-manifest/v1/comic-manifest.schema.json)
 allows `complete`, `partial` and `failed` results and includes a `CANCELLED`
 diagnostic. It does not define an attempt transition table, explicit retry
 lineage, or how cancelled build attempts map to its result statuses.
@@ -191,10 +191,12 @@ authorization. All use synthetic data from the existing Comic Manifest fixture.
 
 ## Compatibility and migration
 
-No released bundle or accepted schema changes under this draft. Comic Manifest v1
-is an unreleased candidate; any accepted lifecycle semantics that alter its closed
-result representation require coordinated Codex/Platform review, updated
-versioned schema/fixtures, and compatibility review before publication. The
+No released bundle or schema changes under this draft. Comic Manifest 1.0.0 is
+published and immutable; any accepted lifecycle semantics that alter its closed
+result representation require coordinated Codex/Platform review, a new versioned
+schema/fixture bundle, and compatibility review before publication. See the
+[no-output failed-result proposal](0012-no-output-failed-build-results.md) for
+one such proposed representation. The
 [manifest versioning policy](../specs/manifests/COMIC-MANIFEST-VERSIONING.md)
 continues to govern release boundaries. Existing Provider Execution and
 Execution Provenance artifacts remain unchanged.
@@ -242,9 +244,10 @@ separate owners and future approved scopes.
    attempt index, cancellation mapping, immutable-write confirmation/recovery
    boundary, and canonical JSON v1 integrity envelope. Timeout mapping is
    deliberately deferred to a separately versioned contract decision.
-2. If accepted, revise the relevant unreleased Comic Manifest candidate and
-   fixture definitions in Codex; review affected Platform consumers before
-   implementation.
+2. If accepted and the lifecycle requires a different result representation,
+   coordinate with RFC 0012 and prepare a separate versioned Comic Manifest
+   schema/fixture bundle. Do not revise the published 1.0.0 artifacts. Review
+   affected Platform consumers before implementation.
 3. Implement any runtime behavior only in separately authorized Platform work.
    No code, schema, runtime test, storage service, release, or production change
    is included in this draft.
