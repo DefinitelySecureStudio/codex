@@ -1,5 +1,12 @@
 # Changelog
 
+## Local candidate — 2026-10-31
+
+Add an opt-in Comic build result 1.1.0 candidate for confirmed no-output
+rate-limit failures and bounded synthetic retry conformance. Released v1
+artifacts and default behavior are preserved. No publication or production
+adoption is declared.
+
 ## Unreleased — Context Builder publication preparation (#86)
 
 - Add an explicit independent release catalog, deterministic artifact tests and

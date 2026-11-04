@@ -14,6 +14,16 @@
 - Conformance evidence: [Studio issue #103](https://github.com/DefinitelySecureStudio/studio/issues/103), [Studio issue #104](https://github.com/DefinitelySecureStudio/studio/issues/104), and finite synthetic fixtures proposed below
 - Decision owner and required A4 reviewers: `@andrewperis`; Codex and Platform maintainers
 
+## Local implementation candidate — 2026-10-31
+
+The authorized bounded implementation now selects result version 1.1.0 and
+a distinct result-only schema, excluding cancellation. See the
+[candidate decision and lifecycle](../specs/comic-build-result-1.1-candidate.md)
+for the exact technical choices and executed-fixture scope. The original
+proposal below records the earlier alternatives; its undecided wording is
+historical to that proposal. Normative acceptance, publication and production
+adoption remain separate review gates.
+
 ## Summary
 
 This draft proposes one narrowly versioned `comic-build-result` representation

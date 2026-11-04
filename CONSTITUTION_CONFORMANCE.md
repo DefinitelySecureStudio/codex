@@ -1,5 +1,18 @@
 # Constitution conformance record
 
+## O02/O03 local retry candidate — 2026-10-31
+
+Owner/reviewer: @andrewperis. Constitution 1.0.0 at
+`a9cc8a503aa30e17820edc62ac95f7cbe10e0564`. Profiles: universal,
+RFC/specification and runtime implementation. Bounded synthetic, in-memory-only
+rate-limit retry candidate; exact version negotiation, actual provenance,
+protected outcome evidence, immutable terminal readback, original budgets and
+explicit caller authority. No new dependencies, private data, creative work or
+exception. Tests and candidate decision documents provide technical evidence;
+owner normative acceptance, production adoption and publication remain pending.
+Released v1 artifacts remain unchanged. Re-review on any provider, storage,
+identity, authority, retention or scope expansion.
+
 ## Stable record ID proposal — 2026-10-24
 
 Owner and required decision reviewer: @andrewperis. Constitution 1.0.0 at
