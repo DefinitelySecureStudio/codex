@@ -13,7 +13,8 @@ constraints; they do not advertise new production, release or approval support.
 The released 1.0.0 schema, specification, fixtures and artifacts are immutable.
 The candidate remains subject to contract-owner review before normative adoption.
 Local implementation authorization does not publish a contract or enable a
-production consumer. No release tuple or adoption date is invented.
+production consumer. No release tuple or adoption date is invented. Exact 1.1.0
+support is additive and opt-in; omitting the capability preserves v1 behavior.
 
 ## Exact capability and compatibility choice
 
@@ -43,7 +44,10 @@ before acceptance/action and absence of output. Unknown or inaccessible output,
 cancellation, validation failure and timeout cannot use the no-output form.
 Existing failed results with verified output digests retain their prior meaning.
 This version introduces no cancellation mapping, new diagnostic or public proof
-field. Provider detail and retry timing remain protected host metadata.
+field. Provider detail and retry timing remain protected host metadata. Only a
+confirmed no-output rate-limit failure can qualify for the one explicit retry.
+Cancellation, timeout, validation-failure and ambiguous-write mappings remain
+deferred.
 
 ## Lifecycle and retry decision
 
@@ -55,11 +59,17 @@ field. Provider detail and retry timing remain protected host metadata.
 | result-prepared → persisting → terminal | freeze result identity, write once, exact readback, confirm terminal link | reconciliation required; no replay or replacement IDs |
 | terminal → explicit retry | caller `authorizeRetry: true`; elapsed delay; original deadline/material budget; maximum two attempts; prior result, outcome, input/prompt bytes and terminal links all reverified | no retry dispatch |
 | retry → terminal | new attempt/execution/result IDs; `retry_of_attempt_id`; unchanged production and old records | no third attempt |
-| restart → inspect | read-only integrity verification | no automatic finalization or retry |
+| restart → inspect | read-only integrity verification | no automatic finalization or retry; this candidate has no writable restart recovery |
 
-The first failed terminal result is not a closed job while retry remains open.
-The caller may explicitly decline it. The second result closes the job regardless
-of outcome. The five-minute deadline and material ledger are never reset. Delay
+The first confirmed no-output rate-limit result remains an open host job while
+retry is available; the caller may explicitly decline it. A confirmed, mappable
+second result closes the host job normally. If the second provider outcome is
+confirmed and retained but cannot map to Comic Manifest, the implementation
+confirms `contract-mapping-blocked` and `job-closed` host events and closes the
+exhausted host job. That closure preserves both provider outcomes and the prior
+Comic result, but it does not fabricate a second Comic result or terminal result
+link. Uncertain outcome/readback/append/close writes and timeouts remain
+unresolved. The five-minute deadline and material ledger are never reset. Delay
 is conservatively measured from the first terminal result, so persistence time
 cannot shorten the provider delay. Adapters perform no hidden retry.
 
