@@ -14,6 +14,10 @@
 - Conformance evidence: [Studio issue #104](https://github.com/DefinitelySecureStudio/studio/issues/104); synthetic fixture expectations below
 - Decision owner and required A4 reviewers: `@andrewperis`; Codex and Platform maintainers
 
+## Implementation reconciliation — 2026-11-05
+
+The merged [Codex candidate](https://github.com/DefinitelySecureStudio/codex/pull/26), [Platform retry](https://github.com/DefinitelySecureStudio/platform/pull/54), and [Platform review fixes](https://github.com/DefinitelySecureStudio/platform/pull/55) implement only the bounded, opt-in synthetic no-output rate-limit retry using the original deadline and material budgets. This Draft's broader cancellation mapping and restart-driven writes/calls remain proposals, not tested candidate behavior or accepted contract. Under the current candidate, restart handling is inspection-only; cancellation, timeout, ambiguous writes, and other unmappable outcomes do not authorize retry. A confirmed unmappable second provider outcome with status `failed`, `cancelled`, or `succeeded` may close the exhausted host job after the outcome and close evidence are confirmed; `timed-out` outcomes remain unresolved and do not emit `job-closed`. Closure does not produce a second Comic result or terminal result link. Contract-owner review remains pending.
+
 ## Summary
 
 This draft proposes finite host limits and explicit cancellation, retry, and
@@ -200,20 +204,18 @@ index and apply the following rules:
 - After `prepared`, before confirmed `dispatch-started`: mark the job
   `cancelled-before-dispatch`; make no provider call and create no
   `comic-build-result`.
-- After `dispatch-started`, while the call is in progress: signal cancellation
-  once. Preserve the actual normalized Provider Execution result. If it returns
-  `cancelled`, use RFC 0010's proposed mapping (`failed` plus `CANCELLED` when
-  there are no verified outputs; `partial` plus `CANCELLED` only when verified
-  outputs are retained). If it returns success after the request, do not relabel
-  the provider outcome as cancelled; finish only already-admitted bounded
-  validation/persistence, with no retry or additional call. If the result is
-  incomplete, use only the existing partial/cancelled mapping when its schema
-  conditions are met; otherwise remain unresolved because this draft defines no
-  additional result mapping.
-- After a normalized outcome is recorded but before persistence: preserve that
-  outcome and stop any future attempt. Apply only the existing RFC 0010 mapping;
-  cancellation does not rewrite success, failure, or a timeout into a different
-  provider result.
+- After `dispatch-started`, while the call is in progress: preserve the actual
+  normalized Provider Execution result. The original proposal considered a
+  cancellation signal and RFC 0010 result mappings, but neither cancellation
+  mapping nor writable cancellation recovery is included in the 1.1.0 candidate.
+  Keep an unmappable outcome protected and `contract-mapping-blocked`; do not
+  create a Comic result or retry. A late success may be handled only under an
+  already supported path with its actual verified result; cancellation does not
+  relabel it.
+- After a normalized outcome is recorded but before persistence: preserve
+  that outcome. Apply only a mapping selected by an accepted contract and the
+  candidate's exact scope; otherwise remain mapping-blocked. Cancellation does
+  not rewrite the provider result.
 - After result persistence starts: do not cancel, overwrite, or repeat the
   write. Read back and verify the fixed bytes and terminal link. If either is
   uncertain, retain the nonterminal reconciliation state.
@@ -258,6 +260,8 @@ provider action, it does not qualify for retry. When the index or verifier
 cannot establish this fact, deny retry and retain evidence for reconciliation.
 
 ### Resume and reconciliation
+
+The writable continuations in this section are proposed RFC behavior only. They are not part of the merged 1.1.0 candidate, which supports read-only inspection after restart; no restart-driven dispatch, cancellation signal, result persistence, or terminal-link append is implemented or accepted here. Treat the authorization table below as deferred design material pending a separate contract-owner decision.
 
 Restart recovery is read-only by default. It may inspect the protected index,
 verify the pinned production reference, read outcomes/results, and reconstruct
@@ -326,9 +330,9 @@ Comic Manifest fixture; no real provider or protected source is involved.
 | Existing Manifest parser boundary | Use an 8 MiB document at the existing parser limits, then one over the bound; separately exceed depth 32, 100,000 values, or 32,768 UTF-8 bytes in a string. | At-boundary input proceeds to schema validation; each over-bound input is rejected before execution with no partial parse treated as success. |
 | Cancel before admission | Cancellation is already set at submission. | No job/attempt IDs, no provider call, no result. |
 | Cancel after preparation, before dispatch marker | Confirm `prepared`, then request cancellation before `dispatch-started`. | Record `cancelled-before-dispatch`; make no provider call or Comic Manifest result. |
-| Cancel after dispatch starts | Mock call receives one cancellation signal and returns normalized `cancelled`; no verified output exists. | Preserve exact execution outcome; map only through RFC 0010 to `failed` plus `CANCELLED`; do not retry. |
+| Cancel after dispatch starts | Mock call returns normalized `cancelled`; no verified output exists. | Preserve exact execution outcome. The candidate defines no cancellation mapping or retry; remain mapping-blocked pending a separate owner decision. |
 | Cancel arrives after successful response | Mock returns a valid success after cancellation request; result is already fully complete and verified. | Preserve the success; finish only bounded validation/persistence and return the exact complete result. Do not relabel Provider Execution as cancelled or start retry. |
-| Cancel after call, before persistence | Successful or failed normalized outcome is confirmed in `provider-outcome`; cancellation arrives before `persisting`. | Preserve the exact provider outcome, stop future attempts, and apply only RFC 0010's existing result mapping. Do not rewrite the outcome or retry. |
+| Cancel after call, before persistence | A normalized outcome is confirmed in `provider-outcome`; cancellation arrives before `persisting`. | Preserve the exact outcome. Use only an accepted mapping; otherwise remain mapping-blocked. Do not rewrite the outcome or retry. |
 | Cancel during persistence | Result write/readback is ambiguous. | Preserve fixed IDs/digest, remain nonterminal, reconcile by reads; never overwrite or retry the write blindly. |
 | Eligible retry | First attempt is terminal/reconciled, failed with `rate-limit`, `retryable=true`, `retry_after_ms`, safe provider detail `RATE_LIMITED_BEFORE_ACCEPTANCE`, no output, same production identity, positive budgets, and explicit caller retry. | Exactly one new attempt with new attempt/execution/result IDs and `retry_of_attempt_id`; prior records unchanged; one provider call. |
 | Retry denials | Repeat with cap exhausted, deadline expired, insufficient bytes, no explicit caller action, missing retry delay, `retryable=false`, changed revision, cancellation, timeout, or ambiguous call/write. | Reject before any new provider call; preserve evidence and prior records. |
