@@ -24,6 +24,10 @@ proposal below records the earlier alternatives; its undecided wording is
 historical to that proposal. Normative acceptance, publication and production
 adoption remain separate review gates.
 
+## Implementation reconciliation — 2026-11-05
+
+Codex [PR #26](https://github.com/DefinitelySecureStudio/codex/pull/26) merged the exact 1.1.0 result-only candidate; Platform [PR #54](https://github.com/DefinitelySecureStudio/platform/pull/54) and [PR #55](https://github.com/DefinitelySecureStudio/platform/pull/55) implement and fix its bounded synthetic retry path. The opening proposal below is historical where it offers undecided version choices or broader mappings. Current candidate scope is exact 1.1.0, additive and opt-in; v1 behavior is unchanged. Only a confirmed no-output rate-limit failure can authorize one separately explicit retry under original limits. Cancellation, timeout, validation-failure and ambiguous-write mappings, plus writable restart recovery, remain deferred. A confirmed but unmappable second outcome may close an exhausted host job after confirmed close evidence; it does not produce a validated second Comic result or terminal result link. Normative acceptance, issue acceptance, release and production adoption remain pending.
+
 ## Summary
 
 This draft proposes one narrowly versioned `comic-build-result` representation
@@ -101,7 +105,7 @@ into the Manifest result.
 | Confirmed outcome | Proposed Comic Manifest result | Retry effect |
 |---|---|---|
 | Rate limit that positively proves rejection before acceptance/action and no output | `failed`, `OUTPUT_MISSING`, no outputs, one truthful empty-output transformation | Eligible for consideration only after immutable result readback and terminal-link confirmation, with all RFC 0011 conditions and a separate explicit caller retry. |
-| Normalized cancellation after dispatch, with confirmed no output | `failed`, `CANCELLED`, no outputs, only if the selected version retains RFC 0010's existing cancellation mapping | Never rate-limit eligible; no retry. Cancellation before dispatch produces no provider call and no Comic Manifest result. |
+| Normalized cancellation after dispatch | No cancellation mapping is selected by the 1.1.0 candidate; preserve the protected outcome and remain `contract-mapping-blocked` pending a separate decision. | No retry. Cancellation before dispatch produces no provider call and no Comic result. |
 | Output-validation failure where provider bytes exist and their digests are verified | Keep actual output digests in the transformation and use RFC 0010's existing `failed` + `VALIDATION_FAILED` mapping where applicable. This is not the no-output form even if no valid Manifest rendition is retained. | Not retryable under RFC 0011. |
 | Validation failure with missing normalized content or unknown provider-byte presence | Preserve the protected outcome; do not infer no bytes from an empty normalized output. Remain `contract-mapping-blocked` until a separate policy and evidence establish a valid mapping. | No retry. |
 | Failure where an output exists, has been produced, or its existence/integrity is uncertain | Do not use the no-output form. Apply an already supported mapping only when its actual evidence satisfies that mapping; otherwise preserve protected evidence and block for reconciliation. | Not eligible under the rate-limit rule. |
@@ -165,12 +169,14 @@ draft PR.
 
 Cancellation before confirmed dispatch prevents the provider call and creates no
 Comic Manifest result. During a dispatched call, preserve the actual normalized
-outcome. A confirmed no-output `cancelled` outcome may use `failed` plus
-`CANCELLED` only under the explicitly selected O02 mapping; cancellation never
-becomes a rate-limit outcome and never permits retry. A late success remains a
-success with its actual verified outputs; cancellation does not relabel it.
-After restart, recovery is read-only by default and requires the authorization
-rules in RFC 0011 for any permitted transition.
+outcome. The 1.1.0 candidate selects no cancellation-to-Comic mapping. Preserve
+any confirmed cancellation outcome in protected evidence and keep it
+`contract-mapping-blocked` until a separate owner decision selects a mapping.
+Cancellation never becomes a rate-limit outcome and never permits retry. A late
+success remains a success with its actual verified outputs; cancellation does
+not relabel it. Restart handling in the current candidate is inspection-only;
+writable recovery remains deferred, even when an RFC proposal describes a
+possible authorization path.
 
 Timeout remains deliberately unmapped. A `timed-out` Provider Execution result
 stays protected and `contract-mapping-blocked`; this proposal adds no `TIMEOUT`
@@ -201,9 +207,9 @@ These are proposed expectations, not executed tests or claims of conformance.
    empty-output. If normalized content is missing and provider-byte presence
    cannot be established, remain blocked without a terminal result.
 3. **Cancellation:** pre-dispatch cancellation makes no call and emits no
-   result. A dispatched mock that returns confirmed `cancelled` with no output
-   can use `failed` + `CANCELLED` only when that existing mapping is in the
-   selected version; it never qualifies for retry. A successful response that
+   result. A dispatched mock that returns confirmed `cancelled` remains
+   mapping-blocked under this candidate; no `CANCELLED` result mapping or retry
+   is implied. A successful response that
    races cancellation preserves its verified outputs and success.
 4. **Version compatibility:** the exact new version validates only when
    explicitly supported. The released 1.0.0 fixture corpus and validation
