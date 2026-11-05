@@ -261,6 +261,8 @@ cannot establish this fact, deny retry and retain evidence for reconciliation.
 
 ### Resume and reconciliation
 
+The writable continuations in this section are proposed RFC behavior only. They are not part of the merged 1.1.0 candidate, which supports read-only inspection after restart; no restart-driven dispatch, cancellation signal, result persistence, or terminal-link append is implemented or accepted here. Treat the authorization table below as deferred design material pending a separate contract-owner decision.
+
 Restart recovery is read-only by default. It may inspect the protected index,
 verify the pinned production reference, read outcomes/results, and reconstruct
 budgets. It MUST NOT append an index record, prepare/advance an attempt, signal
